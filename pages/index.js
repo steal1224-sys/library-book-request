@@ -249,7 +249,7 @@ export default function Home() {
               <Library size={18} className="text-[#EEEDFE]" />
             </div>
             <div>
-              <h1 className="text-[16px] font-bold text-[#26215C] leading-tight">
+              <h1 className="text-[17px] font-bold text-[#26215C] leading-tight" style={{ fontFamily: "Pretendard, sans-serif" }}>
                 모란글샘 구입희망도서 신청
               </h1>
               <p className="text-[12px] text-[#7A7460] leading-tight">부개여고 도서관</p>
