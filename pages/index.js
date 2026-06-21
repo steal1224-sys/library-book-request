@@ -252,7 +252,7 @@ export default function Home() {
               <h1 className="text-[15px] font-medium text-[#26215C] leading-tight">
                 모란글샘 구입희망도서 신청
               </h1>
-              <p className="text-[12px] text-[#7A7460] leading-tight">부개여고 모란글샘</p>
+              <p className="text-[12px] text-[#7A7460] leading-tight">부개여고 도서관</p>
             </div>
           </div>
           <div className="flex gap-1 bg-[#F1EBDD] rounded-lg p-1">
