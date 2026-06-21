@@ -364,8 +364,7 @@ export default function Home() {
                   >
                     우리학교도서관에서 검색해보기 ↗
                   </a>
-                </div>
-                </label>
+                </div>               
                 <div className="relative">
                   <input
                     type="text"
