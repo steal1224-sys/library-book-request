@@ -350,9 +350,7 @@ export default function Home() {
                   />
                 </div>
               </div>
-
-              <div className="relative" ref={searchBoxRef}>
-                <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-[13px] font-medium text-[#26215C]">
                     도서명<span className="text-[#D85A30]"> *</span>
                   </label>
@@ -364,7 +362,7 @@ export default function Home() {
                   >
                     우리학교도서관에서 검색해보기 ↗
                   </a>
-                </div>               
+                </div>      
                 <div className="relative">
                   <input
                     type="text"
