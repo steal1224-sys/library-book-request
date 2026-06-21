@@ -373,7 +373,7 @@ export default function Home() {
                     value={form.title}
                     onChange={(e) => handleTitleChange(e.target.value)}
                     onFocus={() => searchResults.length > 0 && setShowResults(true)}
-                    placeholder="책 제목을 입력하면 검색돼요"
+                    placeholder="책 제목을 입력하면 자동 검색됩니다."
                     autoComplete="off"
                     className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 pr-9 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
                   />
