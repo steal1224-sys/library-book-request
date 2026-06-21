@@ -328,14 +328,14 @@ export default function Home() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[13px] font-medium text-[#26215C] mb-1.5">
-                    {form.role === "학생" ? "학년/반" : "소속"}
+                    {form.role === "학생" ? "학년/반" : "교과"}
                     <span className="text-[#D85A30]"> *</span>
                   </label>
                   <input
                     type="text"
                     value={form.classInfo}
                     onChange={(e) => updateField("classInfo", e.target.value)}
-                    placeholder={form.role === "학생" ? "예: 2학년 3반" : "예: 국어과 교사"}
+                    placeholder={form.role === "학생" ? "예: 203" : "예: 국어"}
                     className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
                   />
                 </div>
