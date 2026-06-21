@@ -286,7 +286,7 @@ export default function Home() {
           <div className="max-w-xl mx-auto">
             <div className="mb-6">
               <h2 className="text-[20px] font-medium text-[#26215C] mb-1.5">
-                읽고 싶은 책을 신청해주세요
+                읽고 싶은 책을 신청해 주세요!
               </h2>
               <p className="text-[14px] text-[#7A7460] leading-relaxed">
                 도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면
