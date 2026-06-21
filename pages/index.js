@@ -352,8 +352,19 @@ export default function Home() {
               </div>
 
               <div className="relative" ref={searchBoxRef}>
-                <label className="block text-[13px] font-medium text-[#26215C] mb-1.5">
-                  도서명<span className="text-[#D85A30]"> *</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-[13px] font-medium text-[#26215C]">
+                    도서명<span className="text-[#D85A30]"> *</span>
+                  </label>
+                  
+                    href="https://read365.edunet.net/PureScreen/SchoolSearch?schoolName=%EB%B6%80%EA%B0%9C%EC%97%AC%EC%9E%90%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90%20%EB%8F%84%EC%84%9C%EA%B4%80&provCode=E10&neisCode=E100000214"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-[#185FA5] underline hover:text-[#0F3D6E]"
+                  >
+                    우리학교도서관에서 검색해보기 ↗
+                  </a>
+                </div>
                 </label>
                 <div className="relative">
                   <input
