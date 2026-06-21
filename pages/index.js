@@ -132,7 +132,7 @@ export default function Home() {
     e.preventDefault();
     setSubmitError("");
     if (!form.name.trim() || !form.classInfo.trim() || !form.title.trim()) {
-      setSubmitError("이름, 학년/반 또는 소속, 도서명은 꼭 입력해주세요.");
+      setSubmitError("이름, 학년/반 또는 교과, 도서명은 꼭 입력해주세요.");
       return;
     }
     setSubmitting(true);
