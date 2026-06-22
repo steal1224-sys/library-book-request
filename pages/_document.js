@@ -12,6 +12,10 @@ export default function Document() {
           crossOrigin="anonymous"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
         />
+      <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Gugi&display=swap"
+        />      
       </Head>
       <body>
         <Main />
