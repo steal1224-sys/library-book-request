@@ -285,7 +285,7 @@ export default function Home() {
         {view === "apply" && (
           <div className="max-w-xl mx-auto">
             <div className="mb-6">
-              <h2 className="text-[20px] font-bold text-[#26215C] mb-1.5">
+              <h2 className="text-[20px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Gugi, sans-serif" }}>
                 ✨ 읽고 싶은 책을 신청해 주세요!
               </h2>
               <p className="text-[14px] text-[#7A7460] leading-relaxed">
