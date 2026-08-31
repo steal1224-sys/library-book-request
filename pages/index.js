@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 const emptyForm = {
-  role: "학생",
+ role: "학생",
   classInfo: "",
   name: "",
   title: "",
@@ -24,6 +24,7 @@ const emptyForm = {
   publisher: "",
   pubYear: "",
   price: "",
+  quantity: "1",
   reason: "",
   link: "",
 };
@@ -770,7 +771,19 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
+              <div>
+                <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <span className="text-[10px]">🟣</span> 구입 수량
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={form.quantity}
+                  onChange={(e) => updateField("quantity", e.target.value)}
+                  placeholder="1"
+                  className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                />
+              </div>
               <div>
                 <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                   <span className="text-[10px]">🟣</span> 신청 사유
