@@ -458,7 +458,7 @@ export default function Home() {
               >
                 모란글샘 구입희망도서 신청
               </h1>
-              <p className="text-[12px] font-bold text-[#4A6B70] leading-normal">부개여고 도서관</p>
+              <p className="text-[12px] font-bold text-[#4A6B70] leading-normal" style={{ fontFamily: "Pretendard, sans-serif" }}>부개여고 도서관</p>
             </div>
           </div>
           <div className="flex gap-1 bg-[#E8E4F5] rounded-lg p-1">
