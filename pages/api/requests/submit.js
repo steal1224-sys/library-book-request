@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "POST 요청만 지원합니다." });
   }
 
-  const { role, classInfo, name, title, author, publisher, pubYear, price, quantity, reason } =
+  const { role, classInfo, name, title, author, publisher, pubYear, price, quantity, reason, link } =
     req.body || {};
 
   if (!role || !classInfo?.trim() || !name?.trim() || !title?.trim()) {
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       publisher: (publisher || "").trim(),
       pubYear: (pubYear || "").trim(),
       price: (price || "").trim(),
-            quantity: (quantity || "1").trim(),
+                  link: (link || "").trim(),
       reason: (reason || "").trim(),
       link: (link || "").trim(),
       createdAt: new Date().toISOString(),
