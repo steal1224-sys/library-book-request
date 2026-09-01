@@ -449,12 +449,12 @@ export default function Home() {
       <header className="border-b border-[#E4DCC8] bg-[#FAF7F0] sticky top-0 z-20">
         <div className="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-md bg-[#3C3489] flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-md bg-[#02343F] flex items-center justify-center shrink-0">
               <Library size={18} className="text-[#EEEDFE]" />
             </div>
             <div>
               <h1
-                className="text-[17px] font-bold text-[#26215C] leading-tight"
+                className="text-[17px] font-bold text-[#02343F] leading-tight"
                 style={{ fontFamily: "Pretendard, sans-serif" }}
               >
                 모란글샘 구입희망도서 신청
@@ -467,8 +467,8 @@ export default function Home() {
               onClick={() => setView("apply")}
               className={`text-[13px] px-3 py-1.5 rounded-md font-medium transition-colors ${
                 view === "apply"
-                  ? "bg-white text-[#26215C] shadow-sm"
-                  : "text-[#7A7460] hover:text-[#26215C]"
+                  ? "bg-white text-[#02343F] shadow-sm"
+                  : "text-[#7A7460] hover:text-[#02343F]"
               }`}
             >
               신청하기
@@ -477,8 +477,8 @@ export default function Home() {
               onClick={() => setView("admin")}
               className={`text-[13px] px-3 py-1.5 rounded-md font-medium transition-colors flex items-center gap-1 ${
                 view === "admin"
-                  ? "bg-white text-[#26215C] shadow-sm"
-                  : "text-[#7A7460] hover:text-[#26215C]"
+                  ? "bg-white text-[#02343F] shadow-sm"
+                  : "text-[#7A7460] hover:text-[#02343F]"
               }`}
             >
               {authed ? <LockOpen size={13} /> : <Lock size={13} />}
@@ -492,7 +492,7 @@ export default function Home() {
         {view === "apply" && (
           <div className="max-w-xl mx-auto">
             <div className="mb-7 rounded-xl border border-[#E4DCC8] bg-white p-4">
-              <h3 className="text-[14px] font-semibold text-[#26215C] mb-1 flex items-center gap-1.5">
+              <h3 className="text-[14px] font-semibold text-[#02343F] mb-1 flex items-center gap-1.5">
                 🔍 먼저, 우리 학교도서관에 있는지 확인해보세요
               </h3>
               <p className="text-[12px] text-[#7A7460] mb-3">
@@ -505,7 +505,7 @@ export default function Home() {
                   onChange={(e) => handleCatalogChange(e.target.value)}
                   placeholder="책 제목을 입력해 보세요"
                   autoComplete="off"
-                  className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 pr-9 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                  className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   {catalogSearching ? (
@@ -524,7 +524,7 @@ export default function Home() {
                   <div className="max-h-48 overflow-y-auto rounded-md border border-[#E4DCC8] divide-y divide-[#F1EBDD]">
                     {catalogResults.map((b, i) => (
                       <div key={i} className="px-3 py-2 bg-[#F7F9F6]">
-                        <p className="text-[13px] font-medium text-[#26215C]">{b.title}</p>
+                        <p className="text-[13px] font-medium text-[#02343F]">{b.title}</p>
                         <p className="text-[11px] text-[#7A7460]">
                           {[b.author, b.publisher, b.year].filter(Boolean).join(" · ")}
                           {b.call ? ` · 청구기호 ${b.call}` : ""}
@@ -549,7 +549,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={useCatalogQueryForApply}
-                    className="shrink-0 text-[11px] font-medium text-white bg-[#3C3489] hover:bg-[#26215C] px-2.5 py-1.5 rounded-md whitespace-nowrap"
+                    className="shrink-0 text-[11px] font-medium text-white bg-[#02343F] hover:bg-[#02343F] px-2.5 py-1.5 rounded-md whitespace-nowrap"
                   >
                     이 책 신청하기 ↓
                   </button>
@@ -559,7 +559,7 @@ export default function Home() {
 
             <div className="mb-6">
               <h2
-                className="text-[20px] font-bold text-[#26215C] mb-1.5"
+                className="text-[20px] font-bold text-[#02343F] mb-1.5"
                 style={{ fontFamily: "Pretendard, sans-serif" }}
               >
                 ✨ 읽고 싶은 책을 신청해 주세요!
@@ -579,7 +579,7 @@ export default function Home() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                   <span className="text-[10px]">🟣</span> 신청자 구분
                 </label>
                 <div className="flex gap-2">
@@ -590,7 +590,7 @@ export default function Home() {
                       onClick={() => updateField("role", r)}
                       className={`flex-1 flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-[13px] font-medium transition-colors ${
                         form.role === r
-                          ? "border-[#534AB7] bg-[#EEEDFE] text-[#26215C]"
+                          ? "border-[#04657A] bg-[#EEEDFE] text-[#02343F]"
                           : "border-[#E4DCC8] text-[#7A7460] hover:border-[#C9BFA3]"
                       }`}
                     >
@@ -603,7 +603,7 @@ export default function Home() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                     <span className="text-[10px]">🟣</span> {form.role === "학생" ? "학년/반" : "소속"}
                     <span className="text-[#D85A30]"> *</span>
                   </label>
@@ -612,11 +612,11 @@ export default function Home() {
                     value={form.classInfo}
                     onChange={(e) => updateField("classInfo", e.target.value)}
                     placeholder={form.role === "학생" ? "예: 203" : "예: 국어과 교사"}
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                     <span className="text-[10px]">🟣</span> 이름<span className="text-[#D85A30]"> *</span>
                   </label>
                   <input
@@ -624,14 +624,14 @@ export default function Home() {
                     value={form.name}
                     onChange={(e) => updateField("name", e.target.value)}
                     placeholder="홍길동"
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
               </div>
 
               <div className="relative" ref={searchBoxRef}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-[13px] font-bold text-[#26215C]" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <label className="block text-[13px] font-bold text-[#02343F]" style={{ fontFamily: "Pretendard, sans-serif" }}>
                     <span className="text-[10px]">🟣</span> 도서명<span className="text-[#D85A30]"> *</span>
                   </label>
                   <a
@@ -651,7 +651,7 @@ export default function Home() {
                     onFocus={() => searchResults.length > 0 && setShowResults(true)}
                     placeholder="책 제목을 입력하면 검색돼요"
                     autoComplete="off"
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 pr-9 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     {searching ? (
@@ -681,7 +681,7 @@ export default function Home() {
                           <div className="w-9 h-12 rounded-sm bg-[#F1EBDD] shrink-0" />
                         )}
                         <div className="min-w-0">
-                          <p className="text-[13px] font-medium text-[#26215C] leading-snug truncate">
+                          <p className="text-[13px] font-medium text-[#02343F] leading-snug truncate">
                             {book.title}
                           </p>
                           <p className="text-[12px] text-[#7A7460] truncate">
@@ -718,7 +718,7 @@ export default function Home() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                     <span className="text-[10px]">🟣</span> 저자
                   </label>
                   <input
@@ -726,11 +726,11 @@ export default function Home() {
                     value={form.author}
                     onChange={(e) => updateField("author", e.target.value)}
                     placeholder="저자명"
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                     <span className="text-[10px]">🟣</span> 출판사
                   </label>
                   <input
@@ -738,11 +738,11 @@ export default function Home() {
                     value={form.publisher}
                     onChange={(e) => updateField("publisher", e.target.value)}
                     placeholder="출판사명"
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                     <span className="text-[10px]">🟣</span> 출판년도
                   </label>
                   <input
@@ -750,11 +750,11 @@ export default function Home() {
                     value={form.pubYear}
                     onChange={(e) => updateField("pubYear", e.target.value)}
                     placeholder="2024"
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                     <span className="text-[10px]">🟣</span> 가격
                   </label>
                   <div className="relative">
@@ -763,7 +763,7 @@ export default function Home() {
                       value={form.price}
                       onChange={(e) => updateField("price", e.target.value.replace(/[^0-9]/g, ""))}
                       placeholder="15000"
-                      className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 pr-8 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                      className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 pr-8 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#B0A887]">
                       원
@@ -772,7 +772,7 @@ export default function Home() {
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                   <span className="text-[10px]">🟣</span> 구입 수량
                 </label>
                 <input
@@ -781,11 +781,11 @@ export default function Home() {
                   value={form.quantity}
                   onChange={(e) => updateField("quantity", e.target.value)}
                   placeholder="1"
-                  className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                  className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-bold text-[#26215C] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                   <span className="text-[10px]">🟣</span> 신청 사유
                 </label>
                 <textarea
@@ -793,7 +793,7 @@ export default function Home() {
                   onChange={(e) => updateField("reason", e.target.value)}
                   placeholder="예: 수업 활용, 진로 관심, 흥미 등 (선택)"
                   rows={3}
-                  className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7] resize-none"
+                  className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A] resize-none"
                 />
               </div>
 
@@ -806,7 +806,7 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 rounded-md bg-[#3C3489] text-white py-2.5 text-[14px] font-medium hover:bg-[#26215C] transition-colors disabled:opacity-60"
+                className="w-full flex items-center justify-center gap-2 rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#02343F] transition-colors disabled:opacity-60"
               >
                 <BookPlus size={16} />
                 {submitting ? "신청 중..." : "신청하기"}
@@ -821,7 +821,7 @@ export default function Home() {
               <Lock size={20} className="text-[#7A7460]" />
             </div>
             <h2
-              className="text-[16px] font-bold text-[#26215C] mb-1"
+              className="text-[16px] font-bold text-[#02343F] mb-1"
               style={{ fontFamily: "Pretendard, sans-serif" }}
             >
               사서선생님 전용 화면
@@ -835,14 +835,14 @@ export default function Home() {
                 value={pwInput}
                 onChange={(e) => setPwInput(e.target.value)}
                 placeholder="비밀번호"
-                className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-center text-[#26215C] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-center text-[#02343F] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 autoFocus
               />
               {pwError && <p className="text-[13px] text-[#993C1D]">{pwError}</p>}
               <button
                 type="submit"
                 disabled={loggingIn}
-                className="w-full rounded-md bg-[#3C3489] text-white py-2.5 text-[14px] font-medium hover:bg-[#26215C] transition-colors disabled:opacity-60"
+                className="w-full rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#02343F] transition-colors disabled:opacity-60"
               >
                 {loggingIn ? "확인 중..." : "확인"}
               </button>
@@ -854,10 +854,10 @@ export default function Home() {
           <div>
             <div className="mb-6 rounded-xl border border-[#E4DCC8] bg-white p-4">
               <h3
-                className="text-[14px] font-bold text-[#26215C] mb-1 flex items-center gap-1.5"
+                className="text-[14px] font-bold text-[#02343F] mb-1 flex items-center gap-1.5"
                 style={{ fontFamily: "Pretendard, sans-serif" }}
               >
-                <FileSpreadsheet size={15} className="text-[#534AB7]" />
+                <FileSpreadsheet size={15} className="text-[#04657A]" />
                 우리 학교도서관 소장도서 업로드
               </h3>
               <p className="text-[12px] text-[#7A7460] mb-3">
@@ -881,7 +881,7 @@ export default function Home() {
               />
               <label
                 htmlFor="catalog-file-input"
-                className={`inline-flex items-center gap-2 rounded-md border border-[#534AB7] text-[#3C3489] bg-[#EEEDFE] hover:bg-[#E2DFFB] px-3 py-2 text-[13px] font-medium cursor-pointer transition-colors ${
+                className={`inline-flex items-center gap-2 rounded-md border border-[#04657A] text-[#02343F] bg-[#EEEDFE] hover:bg-[#E2DFFB] px-3 py-2 text-[13px] font-medium cursor-pointer transition-colors ${
                   uploading ? "opacity-60 pointer-events-none" : ""
                 }`}
               >
@@ -910,15 +910,15 @@ export default function Home() {
             <div className="grid grid-cols-3 gap-3 mb-6">
               <div className="bg-[#F1EBDD] rounded-md px-4 py-3">
                 <p className="text-[12px] text-[#7A7460] mb-1">전체 신청</p>
-                <p className="text-[22px] font-medium text-[#26215C]">{requests.length}</p>
+                <p className="text-[22px] font-medium text-[#02343F]">{requests.length}</p>
               </div>
               <div className="bg-[#F1EBDD] rounded-md px-4 py-3">
                 <p className="text-[12px] text-[#7A7460] mb-1">학생 신청</p>
-                <p className="text-[22px] font-medium text-[#26215C]">{studentCount}</p>
+                <p className="text-[22px] font-medium text-[#02343F]">{studentCount}</p>
               </div>
               <div className="bg-[#F1EBDD] rounded-md px-4 py-3">
                 <p className="text-[12px] text-[#7A7460] mb-1">교사 신청</p>
-                <p className="text-[22px] font-medium text-[#26215C]">{teacherCount}</p>
+                <p className="text-[22px] font-medium text-[#02343F]">{teacherCount}</p>
               </div>
             </div>
 
@@ -933,13 +933,13 @@ export default function Home() {
                   value={query}
                   onChange={(e) => setQueryText(e.target.value)}
                   placeholder="도서명, 이름, 저자, 학년반으로 검색"
-                  className="w-full rounded-md border border-[#E4DCC8] bg-white pl-9 pr-3 py-2 text-[13px] text-[#26215C] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC] focus:border-[#534AB7]"
+                  className="w-full rounded-md border border-[#E4DCC8] bg-white pl-9 pr-3 py-2 text-[13px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 />
               </div>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[13px] text-[#26215C] focus:outline-none focus:ring-2 focus:ring-[#AFA9EC]"
+                className="rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[13px] text-[#02343F] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0]"
               >
                 <option value="전체">전체</option>
                 <option value="학생">학생</option>
@@ -982,7 +982,7 @@ export default function Home() {
                         <span
                           className={`text-[11px] font-medium px-1.5 py-0.5 rounded ${
                             r.role === "학생"
-                              ? "bg-[#EEEDFE] text-[#3C3489]"
+                              ? "bg-[#EEEDFE] text-[#02343F]"
                               : "bg-[#E1F5EE] text-[#0F6E56]"
                           }`}
                         >
@@ -995,7 +995,7 @@ export default function Home() {
                           {formatDate(r.createdAt)}
                         </span>
                       </div>
-                      <p className="text-[15px] font-medium text-[#26215C] mb-0.5">
+                      <p className="text-[15px] font-medium text-[#02343F] mb-0.5">
                         {r.title}
                       </p>
                       {(r.author || r.publisher || r.pubYear || r.price) && (
