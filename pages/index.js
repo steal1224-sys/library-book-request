@@ -582,7 +582,7 @@ export default function Home() {
                   <span className="text-[10px]">🟣</span> 신청자 구분
                 </label>
                 <div className="flex gap-2">
-                  {["학생", "교사"].map((r) => (
+                  {["학생", "교직원"].map((r) => (
                     <button
                       key={r}
                       type="button"
