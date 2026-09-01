@@ -445,8 +445,8 @@ export default function Home() {
   const teacherCount = requests.filter((r) => r.role === "교사").length;
 
   return (
-    <div className="w-full min-h-screen bg-[#F0EDCC] flex flex-col">
-      <header className="border-b border-[#D0E8EC] bg-[#F0EDCC] sticky top-0 z-20">
+    <div className="w-full min-h-screen bg-[#F0F6FA] flex flex-col">
+      <header className="border-b border-[#D0E8EC] bg-[#F0F6FA] sticky top-0 z-20">
         <div className="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-md bg-[#02343F] flex items-center justify-center shrink-0">
@@ -1010,7 +1010,7 @@ export default function Home() {
                         </p>
                       )}
                       {r.reason && (
-                        <p className="text-[12px] text-[#4A6B70] mt-1.5 bg-[#F0EDCC] rounded px-2 py-1.5">
+                        <p className="text-[12px] text-[#4A6B70] mt-1.5 bg-[#F0F6FA] rounded px-2 py-1.5">
                           {r.reason}
                         </p>
                       )}
