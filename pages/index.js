@@ -449,7 +449,7 @@ export default function Home() {
         <div className="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-md bg-[#02343F] flex items-center justify-center shrink-0">
-              <BookHeart size={18} className="text-[#E0F0F3]" />
+             <span style={{ fontSize: "18px" }}>🩷</span>
             </div>
             <div>
               <h1
