@@ -445,12 +445,12 @@ export default function Home() {
   const teacherCount = requests.filter((r) => r.role === "교사").length;
 
   return (
-    <div className="w-full min-h-screen bg-[#FAF7F0] flex flex-col">
-      <header className="border-b border-[#E4DCC8] bg-[#FAF7F0] sticky top-0 z-20">
+    <div className="w-full min-h-screen bg-[#F8FAFB] flex flex-col">
+      <header className="border-b border-[#D0E8EC] bg-[#F8FAFB] sticky top-0 z-20">
         <div className="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-md bg-[#02343F] flex items-center justify-center shrink-0">
-              <Library size={18} className="text-[#EEEDFE]" />
+              <Library size={18} className="text-[#E0F0F3]" />
             </div>
             <div>
               <h1
@@ -459,16 +459,16 @@ export default function Home() {
               >
                 모란글샘 구입희망도서 신청
               </h1>
-              <p className="text-[12px] text-[#7A7460] leading-tight">부개여고 도서관</p>
+              <p className="text-[12px] text-[#4A6B70] leading-tight">부개여고 도서관</p>
             </div>
           </div>
-          <div className="flex gap-1 bg-[#F1EBDD] rounded-lg p-1">
+          <div className="flex gap-1 bg-[#E8F4F6] rounded-lg p-1">
             <button
               onClick={() => setView("apply")}
               className={`text-[13px] px-3 py-1.5 rounded-md font-medium transition-colors ${
                 view === "apply"
                   ? "bg-white text-[#02343F] shadow-sm"
-                  : "text-[#7A7460] hover:text-[#02343F]"
+                  : "text-[#4A6B70] hover:text-[#02343F]"
               }`}
             >
               신청하기
@@ -478,7 +478,7 @@ export default function Home() {
               className={`text-[13px] px-3 py-1.5 rounded-md font-medium transition-colors flex items-center gap-1 ${
                 view === "admin"
                   ? "bg-white text-[#02343F] shadow-sm"
-                  : "text-[#7A7460] hover:text-[#02343F]"
+                  : "text-[#4A6B70] hover:text-[#02343F]"
               }`}
             >
               {authed ? <LockOpen size={13} /> : <Lock size={13} />}
@@ -491,11 +491,11 @@ export default function Home() {
       <main className="flex-1 max-w-3xl mx-auto w-full px-5 py-8">
         {view === "apply" && (
           <div className="max-w-xl mx-auto">
-            <div className="mb-7 rounded-xl border border-[#E4DCC8] bg-white p-4">
+            <div className="mb-7 rounded-xl border border-[#D0E8EC] bg-white p-4">
               <h3 className="text-[14px] font-semibold text-[#02343F] mb-1 flex items-center gap-1.5">
                 🔍 먼저, 우리 학교도서관에 있는지 확인해보세요
               </h3>
-              <p className="text-[12px] text-[#7A7460] mb-3">
+              <p className="text-[12px] text-[#4A6B70] mb-3">
                 도서명을 입력하면 모란글샘 소장 목록에서 바로 찾아드려요.
               </p>
               <div className="relative">
@@ -505,13 +505,13 @@ export default function Home() {
                   onChange={(e) => handleCatalogChange(e.target.value)}
                   placeholder="책 제목을 입력해 보세요"
                   autoComplete="off"
-                  className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   {catalogSearching ? (
-                    <Loader2 size={15} className="animate-spin text-[#B0A887]" />
+                    <Loader2 size={15} className="animate-spin text-[#7AB8C2]" />
                   ) : (
-                    <Search size={15} className="text-[#B0A887]" />
+                    <Search size={15} className="text-[#7AB8C2]" />
                   )}
                 </div>
               </div>
@@ -521,11 +521,11 @@ export default function Home() {
                   <p className="text-[12px] text-[#0F6E56] font-medium flex items-center gap-1">
                     <Check size={12} /> 우리 학교도서관에 있어요! ({catalogResults.length}건)
                   </p>
-                  <div className="max-h-48 overflow-y-auto rounded-md border border-[#E4DCC8] divide-y divide-[#F1EBDD]">
+                  <div className="max-h-48 overflow-y-auto rounded-md border border-[#D0E8EC] divide-y divide-[#E8F4F6]">
                     {catalogResults.map((b, i) => (
                       <div key={i} className="px-3 py-2 bg-[#F7F9F6]">
                         <p className="text-[13px] font-medium text-[#02343F]">{b.title}</p>
-                        <p className="text-[11px] text-[#7A7460]">
+                        <p className="text-[11px] text-[#4A6B70]">
                           {[b.author, b.publisher, b.year].filter(Boolean).join(" · ")}
                           {b.call ? ` · 청구기호 ${b.call}` : ""}
                         </p>
@@ -535,7 +535,7 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-[11px] text-[#7A7460] pt-1">
+                  <p className="text-[11px] text-[#4A6B70] pt-1">
                     이미 있는 책이에요. 그래도 더 구입하고 싶으시면 아래에서 신청해주세요.
                   </p>
                 </div>
@@ -564,7 +564,7 @@ export default function Home() {
               >
                 ✨ 읽고 싶은 책을 신청해 주세요!
               </h2>
-              <p className="text-[14px] text-[#7A7460] leading-relaxed">
+              <p className="text-[14px] text-[#4A6B70] leading-relaxed">
                 ** 도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면
                 저자·출판사·출판년도가 자동으로 채워집니다.
               </p>
@@ -590,8 +590,8 @@ export default function Home() {
                       onClick={() => updateField("role", r)}
                       className={`flex-1 flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-[13px] font-medium transition-colors ${
                         form.role === r
-                          ? "border-[#04657A] bg-[#EEEDFE] text-[#02343F]"
-                          : "border-[#E4DCC8] text-[#7A7460] hover:border-[#C9BFA3]"
+                          ? "border-[#04657A] bg-[#E0F0F3] text-[#02343F]"
+                          : "border-[#D0E8EC] text-[#4A6B70] hover:border-[#A8D4DB]"
                       }`}
                     >
                       {r === "학생" ? <GraduationCap size={14} /> : <User size={14} />}
@@ -612,7 +612,7 @@ export default function Home() {
                     value={form.classInfo}
                     onChange={(e) => updateField("classInfo", e.target.value)}
                     placeholder={form.role === "학생" ? "예: 203" : "예: 국어과 교사"}
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
@@ -624,7 +624,7 @@ export default function Home() {
                     value={form.name}
                     onChange={(e) => updateField("name", e.target.value)}
                     placeholder="홍길동"
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
               </div>
@@ -651,40 +651,40 @@ export default function Home() {
                     onFocus={() => searchResults.length > 0 && setShowResults(true)}
                     placeholder="책 제목을 입력하면 검색돼요"
                     autoComplete="off"
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     {searching ? (
-                      <Loader2 size={15} className="animate-spin text-[#B0A887]" />
+                      <Loader2 size={15} className="animate-spin text-[#7AB8C2]" />
                     ) : (
-                      <Search size={15} className="text-[#B0A887]" />
+                      <Search size={15} className="text-[#7AB8C2]" />
                     )}
                   </div>
                 </div>
 
                 {showResults && searchResults.length > 0 && (
-                  <div className="absolute z-30 mt-1 w-full bg-white border border-[#E4DCC8] rounded-md shadow-lg max-h-80 overflow-y-auto">
+                  <div className="absolute z-30 mt-1 w-full bg-white border border-[#D0E8EC] rounded-md shadow-lg max-h-80 overflow-y-auto">
                     {searchResults.map((book, i) => (
                       <button
                         key={i}
                         type="button"
                         onClick={() => selectBook(book)}
-                        className="w-full flex gap-3 items-start text-left px-3 py-2.5 hover:bg-[#F7F4EC] border-b border-[#F1EBDD] last:border-b-0"
+                        className="w-full flex gap-3 items-start text-left px-3 py-2.5 hover:bg-[#F7F4EC] border-b border-[#E8F4F6] last:border-b-0"
                       >
                         {book.cover ? (
                           <img
                             src={book.cover}
                             alt=""
-                            className="w-9 h-12 object-cover rounded-sm shrink-0 bg-[#F1EBDD]"
+                            className="w-9 h-12 object-cover rounded-sm shrink-0 bg-[#E8F4F6]"
                           />
                         ) : (
-                          <div className="w-9 h-12 rounded-sm bg-[#F1EBDD] shrink-0" />
+                          <div className="w-9 h-12 rounded-sm bg-[#E8F4F6] shrink-0" />
                         )}
                         <div className="min-w-0">
                           <p className="text-[13px] font-medium text-[#02343F] leading-snug truncate">
                             {book.title}
                           </p>
-                          <p className="text-[12px] text-[#7A7460] truncate">
+                          <p className="text-[12px] text-[#4A6B70] truncate">
                             {[book.author, book.publisher, book.pubYear]
                               .filter(Boolean)
                               .join(" · ")}
@@ -704,7 +704,7 @@ export default function Home() {
                   !searching &&
                   searchResults.length === 0 &&
                   form.title.trim().length >= 2 && (
-                    <div className="absolute z-30 mt-1 w-full bg-white border border-[#E4DCC8] rounded-md shadow-lg px-3 py-3 text-[13px] text-[#7A7460]">
+                    <div className="absolute z-30 mt-1 w-full bg-white border border-[#D0E8EC] rounded-md shadow-lg px-3 py-3 text-[13px] text-[#4A6B70]">
                       검색 결과가 없어요. 제목을 직접 입력해 신청할 수 있어요.
                     </div>
                   )}
@@ -726,7 +726,7 @@ export default function Home() {
                     value={form.author}
                     onChange={(e) => updateField("author", e.target.value)}
                     placeholder="저자명"
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
@@ -738,7 +738,7 @@ export default function Home() {
                     value={form.publisher}
                     onChange={(e) => updateField("publisher", e.target.value)}
                     placeholder="출판사명"
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
@@ -750,7 +750,7 @@ export default function Home() {
                     value={form.pubYear}
                     onChange={(e) => updateField("pubYear", e.target.value)}
                     placeholder="2024"
-                    className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
@@ -763,9 +763,9 @@ export default function Home() {
                       value={form.price}
                       onChange={(e) => updateField("price", e.target.value.replace(/[^0-9]/g, ""))}
                       placeholder="15000"
-                      className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 pr-8 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                      className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 pr-8 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#B0A887]">
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#7AB8C2]">
                       원
                     </span>
                   </div>
@@ -781,7 +781,7 @@ export default function Home() {
                   value={form.quantity}
                   onChange={(e) => updateField("quantity", e.target.value)}
                   placeholder="1"
-                  className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 />
               </div>
               <div>
@@ -793,7 +793,7 @@ export default function Home() {
                   onChange={(e) => updateField("reason", e.target.value)}
                   placeholder="예: 수업 활용, 진로 관심, 흥미 등 (선택)"
                   rows={3}
-                  className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A] resize-none"
+                  className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A] resize-none"
                 />
               </div>
 
@@ -817,8 +817,8 @@ export default function Home() {
 
         {view === "admin" && !authed && (
           <div className="max-w-sm mx-auto mt-10 text-center">
-            <div className="w-12 h-12 rounded-full bg-[#F1EBDD] flex items-center justify-center mx-auto mb-4">
-              <Lock size={20} className="text-[#7A7460]" />
+            <div className="w-12 h-12 rounded-full bg-[#E8F4F6] flex items-center justify-center mx-auto mb-4">
+              <Lock size={20} className="text-[#4A6B70]" />
             </div>
             <h2
               className="text-[16px] font-bold text-[#02343F] mb-1"
@@ -826,7 +826,7 @@ export default function Home() {
             >
               사서선생님 전용 화면
             </h2>
-            <p className="text-[13px] text-[#7A7460] mb-5">
+            <p className="text-[13px] text-[#4A6B70] mb-5">
               비밀번호를 입력하면 신청 목록을 확인할 수 있어요.
             </p>
             <form onSubmit={handlePasswordSubmit} className="space-y-3">
@@ -835,7 +835,7 @@ export default function Home() {
                 value={pwInput}
                 onChange={(e) => setPwInput(e.target.value)}
                 placeholder="비밀번호"
-                className="w-full rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[14px] text-center text-[#02343F] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-center text-[#02343F] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 autoFocus
               />
               {pwError && <p className="text-[13px] text-[#993C1D]">{pwError}</p>}
@@ -852,7 +852,7 @@ export default function Home() {
 
         {view === "admin" && authed && (
           <div>
-            <div className="mb-6 rounded-xl border border-[#E4DCC8] bg-white p-4">
+            <div className="mb-6 rounded-xl border border-[#D0E8EC] bg-white p-4">
               <h3
                 className="text-[14px] font-bold text-[#02343F] mb-1 flex items-center gap-1.5"
                 style={{ fontFamily: "Pretendard, sans-serif" }}
@@ -860,7 +860,7 @@ export default function Home() {
                 <FileSpreadsheet size={15} className="text-[#04657A]" />
                 우리 학교도서관 소장도서 업로드
               </h3>
-              <p className="text-[12px] text-[#7A7460] mb-3">
+              <p className="text-[12px] text-[#4A6B70] mb-3">
                 도서관리 시스템에서 받은 소장도서 엑셀(.xls, .xlsx, .csv)을 업로드하면, 신청
                 화면의 소장 검색에 바로 반영돼요. 새로 업로드하면 기존 목록은 전체 교체됩니다.
               </p>
@@ -881,7 +881,7 @@ export default function Home() {
               />
               <label
                 htmlFor="catalog-file-input"
-                className={`inline-flex items-center gap-2 rounded-md border border-[#04657A] text-[#02343F] bg-[#EEEDFE] hover:bg-[#E2DFFB] px-3 py-2 text-[13px] font-medium cursor-pointer transition-colors ${
+                className={`inline-flex items-center gap-2 rounded-md border border-[#04657A] text-[#02343F] bg-[#E0F0F3] hover:bg-[#E2DFFB] px-3 py-2 text-[13px] font-medium cursor-pointer transition-colors ${
                   uploading ? "opacity-60 pointer-events-none" : ""
                 }`}
               >
@@ -900,7 +900,7 @@ export default function Home() {
                 <p className="text-[12px] text-[#993C1D] mt-2">{uploadError}</p>
               )}
 
-              <p className="text-[11px] text-[#7A7460] mt-3">
+              <p className="text-[11px] text-[#4A6B70] mt-3">
                 엑셀 첫 행(또는 표 안)에 "서명"(또는 "도서명", "제목") 열이 있으면 인식돼요.
                 "저자", "출판사", "출판년도", "청구기호", "도서상태" 열이 있으면 함께
                 저장됩니다.
@@ -908,16 +908,16 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-3 gap-3 mb-6">
-              <div className="bg-[#F1EBDD] rounded-md px-4 py-3">
-                <p className="text-[12px] text-[#7A7460] mb-1">전체 신청</p>
+              <div className="bg-[#E8F4F6] rounded-md px-4 py-3">
+                <p className="text-[12px] text-[#4A6B70] mb-1">전체 신청</p>
                 <p className="text-[22px] font-medium text-[#02343F]">{requests.length}</p>
               </div>
-              <div className="bg-[#F1EBDD] rounded-md px-4 py-3">
-                <p className="text-[12px] text-[#7A7460] mb-1">학생 신청</p>
+              <div className="bg-[#E8F4F6] rounded-md px-4 py-3">
+                <p className="text-[12px] text-[#4A6B70] mb-1">학생 신청</p>
                 <p className="text-[22px] font-medium text-[#02343F]">{studentCount}</p>
               </div>
-              <div className="bg-[#F1EBDD] rounded-md px-4 py-3">
-                <p className="text-[12px] text-[#7A7460] mb-1">교사 신청</p>
+              <div className="bg-[#E8F4F6] rounded-md px-4 py-3">
+                <p className="text-[12px] text-[#4A6B70] mb-1">교사 신청</p>
                 <p className="text-[22px] font-medium text-[#02343F]">{teacherCount}</p>
               </div>
             </div>
@@ -926,20 +926,20 @@ export default function Home() {
               <div className="relative flex-1">
                 <Search
                   size={15}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#B0A887]"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7AB8C2]"
                 />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQueryText(e.target.value)}
                   placeholder="도서명, 이름, 저자, 학년반으로 검색"
-                  className="w-full rounded-md border border-[#E4DCC8] bg-white pl-9 pr-3 py-2 text-[13px] text-[#02343F] placeholder:text-[#B0A887] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  className="w-full rounded-md border border-[#D0E8EC] bg-white pl-9 pr-3 py-2 text-[13px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 />
               </div>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="rounded-md border border-[#E4DCC8] bg-white px-3 py-2 text-[13px] text-[#02343F] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0]"
+                className="rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[13px] text-[#02343F] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0]"
               >
                 <option value="전체">전체</option>
                 <option value="학생">학생</option>
@@ -947,7 +947,7 @@ export default function Home() {
               </select>
               <button
                 onClick={loadRequests}
-                className="rounded-md border border-[#E4DCC8] bg-white p-2 text-[#7A7460] hover:bg-[#F1EBDD] transition-colors"
+                className="rounded-md border border-[#D0E8EC] bg-white p-2 text-[#4A6B70] hover:bg-[#E8F4F6] transition-colors"
                 title="새로고침"
               >
                 <RefreshCw size={15} className={loadingList ? "animate-spin" : ""} />
@@ -957,12 +957,12 @@ export default function Home() {
             {loadError && <p className="text-[13px] text-[#993C1D] mb-3">{loadError}</p>}
 
             {loadingList && requests.length === 0 && (
-              <p className="text-[13px] text-[#7A7460] text-center py-10">불러오는 중...</p>
+              <p className="text-[13px] text-[#4A6B70] text-center py-10">불러오는 중...</p>
             )}
 
             {!loadingList && filtered.length === 0 && (
               <div className="text-center py-14">
-                <p className="text-[14px] text-[#7A7460]">
+                <p className="text-[14px] text-[#4A6B70]">
                   {requests.length === 0
                     ? "아직 신청된 도서가 없어요."
                     : "검색 결과가 없어요."}
@@ -974,7 +974,7 @@ export default function Home() {
               {filtered.map((r) => (
                 <div
                   key={r.rowIndex}
-                  className="bg-white border border-[#E4DCC8] rounded-lg px-4 py-3"
+                  className="bg-white border border-[#D0E8EC] rounded-lg px-4 py-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -982,16 +982,16 @@ export default function Home() {
                         <span
                           className={`text-[11px] font-medium px-1.5 py-0.5 rounded ${
                             r.role === "학생"
-                              ? "bg-[#EEEDFE] text-[#02343F]"
+                              ? "bg-[#E0F0F3] text-[#02343F]"
                               : "bg-[#E1F5EE] text-[#0F6E56]"
                           }`}
                         >
                           {r.role}
                         </span>
-                        <span className="text-[12px] text-[#7A7460]">
+                        <span className="text-[12px] text-[#4A6B70]">
                           {r.classInfo} · {r.name}
                         </span>
-                        <span className="text-[11px] text-[#B0A887] ml-auto">
+                        <span className="text-[11px] text-[#7AB8C2] ml-auto">
                           {formatDate(r.createdAt)}
                         </span>
                       </div>
@@ -999,7 +999,7 @@ export default function Home() {
                         {r.title}
                       </p>
                       {(r.author || r.publisher || r.pubYear || r.price) && (
-                        <p className="text-[12px] text-[#7A7460]">
+                        <p className="text-[12px] text-[#4A6B70]">
                           {[r.author, r.publisher, r.pubYear].filter(Boolean).join(" · ")}
                           {r.price && (
                             <span className="text-[#0F6E56] font-medium">
@@ -1010,7 +1010,7 @@ export default function Home() {
                         </p>
                       )}
                       {r.reason && (
-                        <p className="text-[12px] text-[#7A7460] mt-1.5 bg-[#FAF7F0] rounded px-2 py-1.5">
+                        <p className="text-[12px] text-[#4A6B70] mt-1.5 bg-[#F8FAFB] rounded px-2 py-1.5">
                           {r.reason}
                         </p>
                       )}
@@ -1027,7 +1027,7 @@ export default function Home() {
                     </div>
                     <button
                       onClick={() => handleDelete(r.rowIndex)}
-                      className="shrink-0 text-[#B0A887] hover:text-[#993C1D] p-1"
+                      className="shrink-0 text-[#7AB8C2] hover:text-[#993C1D] p-1"
                       title="삭제"
                     >
                       <Trash2 size={15} />
