@@ -505,13 +505,13 @@ export default function Home() {
                   onChange={(e) => handleCatalogChange(e.target.value)}
                   placeholder="책 제목을 입력해 보세요"
                   autoComplete="off"
-                  className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   {catalogSearching ? (
-                    <Loader2 size={15} className="animate-spin text-[#7AB8C2]" />
+                    <Loader2 size={15} className="animate-spin text-[#9CA3AF]" />
                   ) : (
-                    <Search size={15} className="text-[#7AB8C2]" />
+                    <Search size={15} className="text-[#9CA3AF]" />
                   )}
                 </div>
               </div>
@@ -612,7 +612,7 @@ export default function Home() {
                     value={form.classInfo}
                     onChange={(e) => updateField("classInfo", e.target.value)}
                     placeholder={form.role === "학생" ? "예: 203" : "예: 국어과 교사"}
-                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
@@ -624,7 +624,7 @@ export default function Home() {
                     value={form.name}
                     onChange={(e) => updateField("name", e.target.value)}
                     placeholder="홍길동"
-                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
               </div>
@@ -651,13 +651,13 @@ export default function Home() {
                     onFocus={() => searchResults.length > 0 && setShowResults(true)}
                     placeholder="책 제목을 입력하면 검색돼요"
                     autoComplete="off"
-                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     {searching ? (
-                      <Loader2 size={15} className="animate-spin text-[#7AB8C2]" />
+                      <Loader2 size={15} className="animate-spin text-[#9CA3AF]" />
                     ) : (
-                      <Search size={15} className="text-[#7AB8C2]" />
+                      <Search size={15} className="text-[#9CA3AF]" />
                     )}
                   </div>
                 </div>
@@ -726,7 +726,7 @@ export default function Home() {
                     value={form.author}
                     onChange={(e) => updateField("author", e.target.value)}
                     placeholder="저자명"
-                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
@@ -738,7 +738,7 @@ export default function Home() {
                     value={form.publisher}
                     onChange={(e) => updateField("publisher", e.target.value)}
                     placeholder="출판사명"
-                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
@@ -750,7 +750,7 @@ export default function Home() {
                     value={form.pubYear}
                     onChange={(e) => updateField("pubYear", e.target.value)}
                     placeholder="2024"
-                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
                 <div>
@@ -763,9 +763,9 @@ export default function Home() {
                       value={form.price}
                       onChange={(e) => updateField("price", e.target.value.replace(/[^0-9]/g, ""))}
                       placeholder="15000"
-                      className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 pr-8 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                      className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 pr-8 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#7AB8C2]">
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#9CA3AF]">
                       원
                     </span>
                   </div>
@@ -781,7 +781,7 @@ export default function Home() {
                   value={form.quantity}
                   onChange={(e) => updateField("quantity", e.target.value)}
                   placeholder="1"
-                  className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 />
               </div>
               <div>
@@ -793,7 +793,7 @@ export default function Home() {
                   onChange={(e) => updateField("reason", e.target.value)}
                   placeholder="예: 수업 활용, 진로 관심, 흥미 등 (선택)"
                   rows={3}
-                  className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A] resize-none"
+                  className="w-full rounded-md border border-[#D0E8EC] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A] resize-none"
                 />
               </div>
 
@@ -926,14 +926,14 @@ export default function Home() {
               <div className="relative flex-1">
                 <Search
                   size={15}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7AB8C2]"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
                 />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQueryText(e.target.value)}
                   placeholder="도서명, 이름, 저자, 학년반으로 검색"
-                  className="w-full rounded-md border border-[#D0E8EC] bg-white pl-9 pr-3 py-2 text-[13px] text-[#02343F] placeholder:text-[#7AB8C2] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  className="w-full rounded-md border border-[#D0E8EC] bg-white pl-9 pr-3 py-2 text-[13px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                 />
               </div>
               <select
@@ -991,7 +991,7 @@ export default function Home() {
                         <span className="text-[12px] text-[#4A6B70]">
                           {r.classInfo} · {r.name}
                         </span>
-                        <span className="text-[11px] text-[#7AB8C2] ml-auto">
+                        <span className="text-[11px] text-[#9CA3AF] ml-auto">
                           {formatDate(r.createdAt)}
                         </span>
                       </div>
@@ -1027,7 +1027,7 @@ export default function Home() {
                     </div>
                     <button
                       onClick={() => handleDelete(r.rowIndex)}
-                      className="shrink-0 text-[#7AB8C2] hover:text-[#993C1D] p-1"
+                      className="shrink-0 text-[#9CA3AF] hover:text-[#993C1D] p-1"
                       title="삭제"
                     >
                       <Trash2 size={15} />
