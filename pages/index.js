@@ -1,0 +1,1106 @@
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  BookPlus,
+  Search,
+  Lock,
+  LockOpen,
+  Trash2,
+  Check,
+  GraduationCap,
+  User,
+  RefreshCw,
+  Loader2,
+  Upload,
+  FileSpreadsheet,
+} from "lucide-react";
+
+const emptyForm = {
+ role: "학생",
+  classInfo: "",
+  name: "",
+  title: "",
+  author: "",
+  publisher: "",
+  pubYear: "",
+  price: "",
+  quantity: "1",
+  reason: "",
+  link: "",
+};
+
+function formatDate(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const yy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yy}.${mm}.${dd}`;
+}
+
+// ---- 소장도서 엑셀 파싱 헬퍼 ----
+// 브라우저에서 직접 파일을 읽어 파싱한다 (서버로 큰 파일을 보내지 않기 위함).
+// 나이스 DLS 등에서 내보낸 도서원부는 상단에 제목/날짜 같은 머리말이
+// 여러 줄 있는 경우가 많아, 헤더 행을 자동으로 찾아서 처리한다.
+
+const TITLE_HEADER_CANDIDATES = ["서명", "도서명", "제목", "title"];
+const AUTHOR_HEADER_CANDIDATES = ["저자", "지은이", "author"];
+
+function pickField(row, candidates) {
+  for (const key of Object.keys(row)) {
+    const norm = String(key).replace(/\s/g, "");
+    for (const cand of candidates) {
+      if (norm.includes(cand)) {
+        return String(row[key] ?? "").trim();
+      }
+    }
+  }
+  return "";
+}
+
+function findHeaderRowIndex(rows2d) {
+  const maxScan = Math.min(rows2d.length, 30); // 상단 30행 안에서만 탐색
+  for (let i = 0; i < maxScan; i++) {
+    const row = rows2d[i] || [];
+    const joined = row.map((c) => String(c ?? "")).join("");
+    if (TITLE_HEADER_CANDIDATES.some((cand) => joined.includes(cand))) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function parseWorkbookToBooks(XLSX, buffer) {
+  const workbook = XLSX.read(buffer, { type: "array", codepage: 65001 });
+  const firstSheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[firstSheetName];
+
+  const rows2d = XLSX.utils.sheet_to_json(sheet, {
+    header: 1,
+    defval: "",
+    blankrows: false,
+    raw: false,
+  });
+
+  let rows;
+  const headerIdx = findHeaderRowIndex(rows2d);
+
+  if (headerIdx === -1) {
+    rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+  } else {
+    // xlsx의 range 옵션은 헤더 자동 인식과 충돌할 수 있어 직접 매핑한다.
+    const headerRow = rows2d[headerIdx];
+    const dataRows = rows2d.slice(headerIdx + 1);
+    rows = dataRows.map((r) => {
+      const obj = {};
+      headerRow.forEach((h, i) => {
+        if (h) obj[h] = r[i];
+      });
+      return obj;
+    });
+  }
+
+  return rows
+    .map((row) => ({
+      title: pickField(row, TITLE_HEADER_CANDIDATES),
+      author: pickField(row, AUTHOR_HEADER_CANDIDATES),
+      publisher: pickField(row, ["출판사", "publisher"]),
+      year: pickField(row, ["출판년도", "발행년도", "year"]),
+      call: pickField(row, ["청구기호", "call"]),
+      status: pickField(row, ["도서상태", "상태", "status"]),
+    }))
+    // 합계행, 빈 행 등 도서명이 없는 행은 제외한다.
+    .filter((b) => b.title && b.title.replace(/\s/g, "") !== "합계");
+}
+
+export default function Home() {
+  const [view, setView] = useState("apply"); // apply | admin
+
+  // ---- 신청 폼 상태 ----
+  const [form, setForm] = useState(emptyForm);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [justSubmitted, setJustSubmitted] = useState(false);
+
+  // ---- 알라딘 검색 상태 ----
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const searchTimer = useRef(null);
+  const searchBoxRef = useRef(null);
+
+  // ---- 우리 학교도서관 소장 검색 상태 ----
+  const [catalogQuery, setCatalogQuery] = useState("");
+  const [catalogResults, setCatalogResults] = useState([]);
+  const [catalogSearching, setCatalogSearching] = useState(false);
+  const [catalogSearched, setCatalogSearched] = useState(false);
+  const catalogTimer = useRef(null);
+
+  // ---- 관리자 상태 ----
+  const [authed, setAuthed] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [pwInput, setPwInput] = useState("");
+  const [pwError, setPwError] = useState("");
+  const [loggingIn, setLoggingIn] = useState(false);
+
+  const [requests, setRequests] = useState([]);
+  const [loadingList, setLoadingList] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [query, setQueryText] = useState("");
+  const [roleFilter, setRoleFilter] = useState("전체");
+
+  // ---- 관리자: 소장도서 업로드 상태 ----
+  const [catalogCount, setCatalogCount] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState("");
+  const [uploadError, setUploadError] = useState("");
+  const fileInputRef = useRef(null);
+
+  // 검색창 바깥 클릭 시 결과 닫기
+  useEffect(() => {
+    function onClickOutside(e) {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(e.target)) {
+        setShowResults(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
+
+  function updateField(key, value) {
+    setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function handleTitleChange(value) {
+    updateField("title", value);
+    setSelectedBook(null);
+
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+
+    if (!value.trim() || value.trim().length < 2) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    searchTimer.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const res = await fetch(
+          `/api/aladin-search?query=${encodeURIComponent(value.trim())}`
+        );
+        const data = await res.json();
+        if (res.ok && Array.isArray(data.items)) {
+          setSearchResults(data.items);
+          setShowResults(true);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (e) {
+        setSearchResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 450);
+  }
+
+  function selectBook(book) {
+    setForm((f) => ({
+      ...f,
+      title: book.title,
+      author: book.author,
+      publisher: book.publisher,
+      pubYear: book.pubYear,
+      price: book.priceStandard != null ? String(book.priceStandard) : f.price,
+      link: book.link || f.link,
+    }));
+    setSelectedBook(book);
+    setShowResults(false);
+  }
+
+  function handleCatalogChange(value) {
+    setCatalogQuery(value);
+    setCatalogSearched(false);
+
+    if (catalogTimer.current) clearTimeout(catalogTimer.current);
+
+    if (!value.trim() || value.trim().length < 2) {
+      setCatalogResults([]);
+      return;
+    }
+
+    catalogTimer.current = setTimeout(async () => {
+      setCatalogSearching(true);
+      try {
+        const res = await fetch(
+          `/api/catalog-search?query=${encodeURIComponent(value.trim())}`
+        );
+        const data = await res.json();
+        setCatalogResults(res.ok && Array.isArray(data.items) ? data.items : []);
+      } catch (e) {
+        setCatalogResults([]);
+      } finally {
+        setCatalogSearching(false);
+        setCatalogSearched(true);
+      }
+    }, 400);
+  }
+
+  function useCatalogQueryForApply() {
+    // 1. 도서명을 신청폼에 자동 입력 + 알라딘 검색 트리거
+    handleTitleChange(catalogQuery);
+    // 2. 신청 탭으로 전환 (혹시 다른 탭이면)
+    setView("apply");
+    // 3. 신청폼으로 스크롤
+    setTimeout(() => {
+      if (searchBoxRef.current) {
+        searchBoxRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        // 도서명 입력칸에 포커스
+        const input = searchBoxRef.current.querySelector("input");
+        if (input) input.focus();
+      }
+    }, 100);
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitError("");
+    if (!form.name.trim() || !form.classInfo.trim() || !form.title.trim()) {
+      setSubmitError("이름, 학년/반 또는 소속, 도서명은 꼭 입력해주세요.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/requests/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "신청 중 문제가 발생했어요.");
+      }
+      setForm(emptyForm);
+      setSelectedBook(null);
+      setJustSubmitted(true);
+      setTimeout(() => setJustSubmitted(false), 3500);
+    } catch (err) {
+      setSubmitError(err.message || "신청 중 문제가 발생했어요. 다시 시도해주세요.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handlePasswordSubmit(e) {
+    e.preventDefault();
+    setPwError("");
+    setLoggingIn(true);
+    try {
+      const res = await fetch("/api/admin-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pwInput }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "비밀번호가 올바르지 않아요.");
+      }
+      setAdminPassword(pwInput);
+      setAuthed(true);
+      setPwInput("");
+    } catch (err) {
+      setPwError(err.message || "비밀번호가 올바르지 않아요.");
+    } finally {
+      setLoggingIn(false);
+    }
+  }
+
+  const loadRequests = useCallback(async () => {
+    if (!adminPassword) return;
+    setLoadingList(true);
+    setLoadError("");
+    try {
+      const res = await fetch("/api/requests/list", {
+        headers: { "x-admin-password": adminPassword },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "조회에 실패했어요.");
+      setRequests(data.items || []);
+    } catch (err) {
+      setLoadError(err.message || "목록을 불러오지 못했어요.");
+    } finally {
+      setLoadingList(false);
+    }
+  }, [adminPassword]);
+
+  const loadCatalogStatus = useCallback(async () => {
+    if (!adminPassword) return;
+    try {
+      const res = await fetch("/api/catalog-status", {
+        headers: { "x-admin-password": adminPassword },
+      });
+      const data = await res.json();
+      if (res.ok) setCatalogCount(data.count);
+    } catch (e) {
+      // 상태 조회 실패는 조용히 무시 (핵심 기능 아님)
+    }
+  }, [adminPassword]);
+
+  useEffect(() => {
+    if (view === "admin" && authed) {
+      loadRequests();
+      loadCatalogStatus();
+    }
+  }, [view, authed, loadRequests, loadCatalogStatus]);
+
+  async function handleDelete(rowIndex) {
+    try {
+      const res = await fetch("/api/requests/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-password": adminPassword,
+        },
+        body: JSON.stringify({ rowIndex }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "삭제에 실패했어요.");
+      }
+      setRequests((prev) => prev.filter((r) => r.rowIndex !== rowIndex));
+    } catch (err) {
+      setLoadError(err.message || "삭제 중 오류가 발생했어요.");
+    }
+  }
+
+  async function handleCatalogUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setUploadMessage("");
+    setUploadError("");
+
+    try {
+      // xlsx 라이브러리는 브라우저에서만 필요해서, 페이지 로드시 매번 불러오지 않고
+      // 업로드할 때만 동적으로 불러온다 (초기 로딩 속도에 영향 없게).
+      const XLSX = await import("xlsx");
+
+      const buffer = await file.arrayBuffer();
+      const books = parseWorkbookToBooks(XLSX, buffer);
+
+      if (books.length === 0) {
+        throw new Error(
+          "도서명(서명) 컬럼을 찾지 못했습니다. 엑셀 안에 '서명' 또는 '도서명' 열이 있는지 확인해주세요."
+        );
+      }
+
+      // 엑셀 파일은 통째로 보내면 용량 제한에 걸리지만, 파싱된 JSON은 훨씬 가벼워서
+      // 그래도 큰 학교(수만 권)를 대비해 배치로 나눠 전송한다.
+      const BATCH_SIZE = 2000;
+      const totalBatches = Math.ceil(books.length / BATCH_SIZE);
+      let savedCount = 0;
+
+      for (let i = 0; i < totalBatches; i++) {
+        const batch = books.slice(i * BATCH_SIZE, (i + 1) * BATCH_SIZE);
+        const isFirstBatch = i === 0;
+        const isLastBatch = i === totalBatches - 1;
+
+        setUploadMessage(`업로드 중... (${i + 1}/${totalBatches}단계)`);
+
+        const res = await fetch("/api/catalog-upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-password": adminPassword,
+          },
+          body: JSON.stringify({ books: batch, isFirstBatch, isLastBatch }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "업로드 중 오류가 발생했어요.");
+        }
+        // 서버는 "이번 배치에서 저장한 건수"를 반환하므로, 전체 건수는
+        // 브라우저에서 직접 누적해서 계산한다 (마지막 배치 숫자만 보이는 문제 방지).
+        savedCount += batch.length;
+      }
+
+      setUploadMessage(`${savedCount.toLocaleString()}건의 소장도서가 등록되었습니다.`);
+      setCatalogCount(savedCount);
+    } catch (err) {
+      setUploadError(err.message || "업로드 중 오류가 발생했어요.");
+      setUploadMessage("");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  const filtered = requests.filter((r) => {
+    const matchesRole = roleFilter === "전체" || r.role === roleFilter;
+    const q = query.trim().toLowerCase();
+    const matchesQuery =
+      !q ||
+      r.title.toLowerCase().includes(q) ||
+      r.name.toLowerCase().includes(q) ||
+      r.author.toLowerCase().includes(q) ||
+      r.classInfo.toLowerCase().includes(q);
+    return matchesRole && matchesQuery;
+  });
+
+  const studentCount = requests.filter((r) => r.role === "학생").length;
+  const teacherCount = requests.filter((r) => r.role === "교직원").length;
+
+  return (
+    <div className="w-full min-h-screen bg-[#F5F3FA] flex flex-col">
+      <header className="border-b border-[#DDD8F0] bg-[#E0F0F3] sticky top-0 z-20 shadow-md">
+        <div className="max-w-3xl mx-auto px-5 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-md bg-[#02343F] flex items-center justify-center shrink-0">
+              <span style={{ fontSize: "18px" }}>🩷</span>
+            </div>
+            <div>
+              <h1
+                className="text-[13px] md:text-[17px] font-bold text-[#02343F] leading-tight whitespace-nowrap"
+                style={{ fontFamily: "'Gowun Batang', serif" }}
+              >
+                모란글샘 구입희망도서 신청
+              </h1>
+              <p className="hidden md:block text-[12px] font-bold text-[#4A6B70] leading-loose" style={{ fontFamily: "'Do Hyeon', sans-serif" }}>부개여고 도서관</p>
+            </div>
+          </div>
+          <div className="flex gap-1 bg-[#E8E4F5] rounded-lg p-1">
+            <button
+              onClick={() => setView("apply")}
+              className={`text-[13px] px-3 py-1.5 rounded-md font-medium transition-colors ${
+                view === "apply"
+                  ? "bg-white text-[#02343F] shadow-sm"
+                  : "text-[#4A6B70] hover:text-[#02343F]"
+              }`}
+            >
+              신청하기
+            </button>
+            <button
+              onClick={() => setView("admin")}
+              className={`text-[13px] px-3 py-1.5 rounded-md font-medium transition-colors flex items-center gap-1 ${
+                view === "admin"
+                  ? "bg-white text-[#02343F] shadow-sm"
+                  : "text-[#4A6B70] hover:text-[#02343F]"
+              }`}
+            >
+              {authed ? <LockOpen size={13} /> : <Lock size={13} />}
+              관리
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1 max-w-3xl md:max-w-6xl mx-auto w-full px-5 py-8">
+        {view === "apply" && (
+          <div className="max-w-xl mx-auto md:max-w-none">
+            {/* 웹: 2단 레이아웃 (왼쪽: 소장검색+신청안내 / 오른쪽: 신청폼) / 모바일: 기존 세로 스크롤 */}
+            <div className="md:grid md:grid-cols-3 md:gap-6 md:items-start">
+              {/* 왼쪽 열: 소장검색 + 신청안내 */}
+              <div className="md:col-span-1 md:flex md:flex-col md:gap-6">
+              {/* 카드 1: 신청 안내 (웹에서만 표시) */}
+              <div className="hidden md:flex md:flex-col md:rounded-xl md:border md:border-[#DDD8F0] md:shadow-sm md:overflow-hidden">
+                <div className="flex items-center gap-2 bg-[#534AB7] px-4 py-3">
+                  <span style={{ fontSize: "14px" }}>📋</span>
+                  <span className="text-white text-[13px] font-bold">신청 안내</span>
+                </div>
+                <div className="p-4 space-y-3 bg-white">
+                  <div className="text-[13px] font-bold text-[#02343F]" style={{ fontFamily: "'Gowun Batang', serif" }}>✨ 읽고 싶은 책을 신청해 주세요!</div>
+                  <p className="text-[13px] text-[#4B5563] leading-relaxed">** 도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면 저자·출판사·출판년도가 자동으로 채워집니다.</p>
+                  <div className="border-t border-[#DDD8F0] pt-3 space-y-2">
+                    <div className="flex items-start gap-2 text-[13px] text-[#4A6B70]"><span className="text-[#04657A] font-bold shrink-0">·</span>도서명과 저자는 꼭 입력해주세요</div>
+                    <div className="flex items-start gap-2 text-[13px] text-[#4A6B70]"><span className="text-[#04657A] font-bold shrink-0">·</span>알라딘 자동 검색을 지원해요</div>
+                    <div className="flex items-start gap-2 text-[13px] text-[#4A6B70]"><span className="text-[#04657A] font-bold shrink-0">·</span>신청 후 검토를 거쳐 구입 여부를 결정합니다</div>
+                    <div className="flex items-start gap-2 text-[13px] text-[#4A6B70]"><span className="text-[#04657A] font-bold shrink-0">·</span>중복 신청은 삼가 주세요</div>
+                  </div>
+                  <div className="bg-[#EAF4F7] rounded-lg p-3 border border-[#D0E8EC]">
+                    <p className="text-[11px] text-[#4A6B70] mb-1">현재 소장 도서</p>
+                    <p className="text-[20px] font-bold text-[#02343F]">24,481권</p>
+                    <a href="https://read365.edunet.net/PureScreen/SchoolSearch?schoolName=%EB%B6%80%EA%B0%9C%EC%97%AC%EC%9E%90%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90%20%EB%8F%84%EC%84%9C%EA%B4%80&provCode=E10&neisCode=E100000214" target="_blank" rel="noopener noreferrer" className="text-[11px] text-[#185FA5] underline mt-1 inline-block">우리학교도서관에서 검색해보기 ↗</a>
+                  </div>
+                </div>
+              </div>
+              {/* 카드 2: 소장 검색 */}
+              <div className="md:rounded-xl md:border md:border-[#DDD8F0] md:shadow-sm md:overflow-hidden md:flex md:flex-col">
+                <div className="hidden md:flex md:items-center md:gap-2 md:bg-[#534AB7] md:px-4 md:py-3">
+                  <span style={{ fontSize: "14px" }}>🔍</span>
+                  <span className="text-white text-[13px] font-bold">소장 검색</span>
+                </div>
+                <div className="md:p-4 md:bg-white">
+            <div className="mb-7 md:mb-0 rounded-xl border border-[#DDD8F0] bg-white p-4 md:border-0 md:rounded-none md:shadow-none md:p-0">
+              <h3 className="text-[14px] font-semibold text-[#02343F] mb-1 flex items-center gap-1.5">
+                🔍 먼저, 우리 학교도서관에 있는지 확인해보세요
+              </h3>
+              <p className="text-[12px] text-[#4A6B70] mb-3">
+                도서명을 입력하면 모란글샘 소장 목록에서 바로 찾아드려요.
+              </p>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={catalogQuery}
+                  onChange={(e) => handleCatalogChange(e.target.value)}
+                  placeholder="책 제목을 입력해 보세요"
+                  autoComplete="off"
+                  className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {catalogSearching ? (
+                    <Loader2 size={15} className="animate-spin text-[#9CA3AF]" />
+                  ) : (
+                    <Search size={15} className="text-[#9CA3AF]" />
+                  )}
+                </div>
+              </div>
+
+              {!catalogSearching && catalogSearched && catalogResults.length > 0 && (
+                <div className="mt-3 space-y-1.5">
+                  <p className="text-[12px] text-[#0F6E56] font-medium flex items-center gap-1">
+                    <Check size={12} /> 우리 학교도서관에 있어요! ({catalogResults.length}건)
+                  </p>
+                  <div className="max-h-48 overflow-y-auto rounded-md border border-[#DDD8F0] divide-y divide-[#E8E4F5]">
+                    {catalogResults.map((b, i) => (
+                      <div key={i} className="px-3 py-2 bg-[#F7F9F6]">
+                        <p className="text-[13px] font-medium text-[#02343F]">{b.title}</p>
+                        <p className="text-[11px] text-[#4A6B70]">
+                          {[b.author, b.publisher, b.year].filter(Boolean).join(" · ")}
+                          {b.call ? ` · 청구기호 ${b.call}` : ""}
+                        </p>
+                        {b.status && b.status !== "대출가능" && (
+                          <p className="text-[11px] text-[#993C1D]">현재 상태: {b.status}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-[#4A6B70] pt-1">
+                    이미 있는 책이에요. 그래도 더 구입하고 싶으시면 아래에서 신청해주세요.
+                  </p>
+                </div>
+              )}
+
+              {!catalogSearching && catalogSearched && catalogResults.length === 0 && (
+                <div className="mt-3 space-y-2">
+                  <div className="rounded-md bg-[#FAECE7] px-3 py-2.5">
+                    <p className="text-[12px] text-[#993C1D] font-medium mb-1">
+                      우리 학교도서관에는 없는 책이에요.
+                    </p>
+                    <p className="text-[11px] text-[#993C1D]">
+                      버튼을 누르면 도서명이 신청폼에 자동으로 입력되고,
+                      알라딘에서 저자·출판사·가격 정보도 자동으로 채워져요!
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={useCatalogQueryForApply}
+                    className="w-full flex items-center justify-center gap-1.5 text-[14px] font-bold text-white bg-[#534AB7] hover:bg-[#3C3489] px-3 py-3 rounded-md transition-colors shadow-sm"
+                  >
+                    📝 신청폼으로 이동해서 바로 신청하기 →
+                  </button>
+                </div>
+              )}
+            </div>
+                </div>
+              </div>
+              </div>{/* 왼쪽 열 닫기 */}
+              {/* 오른쪽 열: 신청 폼 (col-span-2) */}
+              {/* 카드 3: 신청 폼 */}
+              <div className="md:col-span-2 md:rounded-xl md:border md:border-[#DDD8F0] md:shadow-sm md:overflow-hidden">
+                <div className="hidden md:flex md:items-center md:gap-2 md:bg-[#534AB7] md:px-4 md:py-3">
+                  <span style={{ fontSize: "14px" }}>📝</span>
+                  <span className="text-white text-[13px] font-bold">신청하기</span>
+                  <span className="ml-auto text-[11px] text-white opacity-75">← 소장 검색 후 없으면 여기서 신청하세요</span>
+                </div>
+                <div className="md:p-4 md:bg-white">
+
+            <div className="mb-6 md:hidden">
+              <h2
+                className="text-[20px] font-bold text-[#02343F] mb-1.5"
+                style={{ fontFamily: "'Gowun Batang', serif" }}
+              >
+                ✨ 읽고 싶은 책을 신청해 주세요!
+              </h2>
+              <p className="text-[14px] text-[#4B5563] leading-relaxed">
+                ** 도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면
+                저자·출판사·출판년도가 자동으로 채워집니다.
+              </p>
+            </div>
+
+            {justSubmitted && (
+              <div className="mb-5 flex items-center gap-2 rounded-lg border border-[#5DCAA5] bg-[#E1F5EE] px-4 py-3 text-[13px] text-[#085041]">
+                <Check size={16} className="shrink-0" />
+                신청이 접수되었어요. 감사합니다!
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <span className="text-[10px]">🟣</span> 신청자 구분
+                </label>
+                <div className="flex gap-2">
+                  {["학생", "교직원"].map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => updateField("role", r)}
+                      className={`flex-1 flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-[13px] font-medium transition-colors ${
+                        form.role === r
+                          ? "border-[#04657A] bg-[#E0F0F3] text-[#02343F]"
+                          : "border-[#DDD8F0] text-[#4A6B70] hover:border-[#A8D4DB]"
+                      }`}
+                    >
+                      {r === "학생" ? <GraduationCap size={14} /> : <User size={14} />}
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                    <span className="text-[10px]">🟣</span> {form.role === "학생" ? "학년/반" : "소속"}
+                    <span className="text-[#D85A30]"> *</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.classInfo}
+                    onChange={(e) => updateField("classInfo", e.target.value)}
+                    placeholder={form.role === "학생" ? "예: 203" : "예: 국어과"}
+                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                    <span className="text-[10px]">🟣</span> 이름<span className="text-[#D85A30]"> *</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => updateField("name", e.target.value)}
+                    placeholder="홍길동"
+                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  />
+                </div>
+              </div>
+
+              <div className="relative" ref={searchBoxRef}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-[13px] font-bold text-[#02343F]" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                    <span className="text-[10px]">🟣</span> 도서명<span className="text-[#D85A30]"> *</span>
+                  </label>
+                  <a
+                    href="https://read365.edunet.net/PureScreen/SchoolSearch?schoolName=%EB%B6%80%EA%B0%9C%EC%97%AC%EC%9E%90%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90%20%EB%8F%84%EC%84%9C%EA%B4%80&provCode=E10&neisCode=E100000214"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-[#185FA5] underline hover:text-[#0F3D6E]"
+                  >
+                    우리학교도서관에서 검색해보기 ↗
+                  </a>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={form.title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    onFocus={() => searchResults.length > 0 && setShowResults(true)}
+                    placeholder="책 제목을 입력하면 검색돼요"
+                    autoComplete="off"
+                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {searching ? (
+                      <Loader2 size={15} className="animate-spin text-[#9CA3AF]" />
+                    ) : (
+                      <Search size={15} className="text-[#9CA3AF]" />
+                    )}
+                  </div>
+                </div>
+
+                {showResults && searchResults.length > 0 && (
+                  <div className="absolute z-30 mt-1 w-full bg-white border border-[#DDD8F0] rounded-md shadow-lg max-h-80 overflow-y-auto">
+                    {searchResults.map((book, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => selectBook(book)}
+                        className="w-full flex gap-3 items-start text-left px-3 py-2.5 hover:bg-[#F7F4EC] border-b border-[#E8E4F5] last:border-b-0"
+                      >
+                        {book.cover ? (
+                          <img
+                            src={book.cover}
+                            alt=""
+                            className="w-9 h-12 object-cover rounded-sm shrink-0 bg-[#E8E4F5]"
+                          />
+                        ) : (
+                          <div className="w-9 h-12 rounded-sm bg-[#E8E4F5] shrink-0" />
+                        )}
+                        <div className="min-w-0">
+                          <p className="text-[13px] font-medium text-[#02343F] leading-snug truncate">
+                            {book.title}
+                          </p>
+                          <p className="text-[12px] text-[#4A6B70] truncate">
+                            {[book.author, book.publisher, book.pubYear]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </p>
+                          {book.priceStandard != null && (
+                            <p className="text-[12px] text-[#0F6E56] font-medium">
+                              {book.priceStandard.toLocaleString()}원
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {showResults &&
+                  !searching &&
+                  searchResults.length === 0 &&
+                  form.title.trim().length >= 2 && (
+                    <div className="absolute z-30 mt-1 w-full bg-white border border-[#DDD8F0] rounded-md shadow-lg px-3 py-3 text-[13px] text-[#4A6B70]">
+                      검색 결과가 없어요. 제목을 직접 입력해 신청할 수 있어요.
+                    </div>
+                  )}
+
+                {selectedBook && (
+                  <p className="mt-1.5 text-[12px] text-[#0F6E56] flex items-center gap-1">
+                    <Check size={12} /> 알라딘 검색 결과에서 정보를 가져왔어요
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                    <span className="text-[10px]">🟣</span> 저자
+                  </label>
+                  <input
+                    type="text"
+                    value={form.author}
+                    onChange={(e) => updateField("author", e.target.value)}
+                    placeholder="저자명"
+                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                    <span className="text-[10px]">🟣</span> 출판사
+                  </label>
+                  <input
+                    type="text"
+                    value={form.publisher}
+                    onChange={(e) => updateField("publisher", e.target.value)}
+                    placeholder="출판사명"
+                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                    <span className="text-[10px]">🟣</span> 출판년도
+                  </label>
+                  <input
+                    type="text"
+                    value={form.pubYear}
+                    onChange={(e) => updateField("pubYear", e.target.value)}
+                    placeholder="2024"
+                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                    <span className="text-[10px]">🟣</span> 가격
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={form.price}
+                      onChange={(e) => updateField("price", e.target.value.replace(/[^0-9]/g, ""))}
+                      placeholder="15000"
+                      className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 pr-8 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#9CA3AF]">
+                      원
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <span className="text-[10px]">🟣</span> 구입 수량
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={form.quantity}
+                  onChange={(e) => updateField("quantity", e.target.value)}
+                  placeholder="1"
+                  className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                />
+              </div>
+              <div>
+                <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                  <span className="text-[10px]">🟣</span> 신청 사유
+                </label>
+                <textarea
+                  value={form.reason}
+                  onChange={(e) => updateField("reason", e.target.value)}
+                  placeholder="예: 수업 활용, 진로 관심, 흥미 등 (선택)"
+                  rows={3}
+                  className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A] resize-none"
+                />
+              </div>
+
+              {submitError && (
+                <p className="text-[13px] text-[#993C1D] bg-[#FAECE7] rounded-md px-3 py-2">
+                  {submitError}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full flex items-center justify-center gap-2 rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#02343F] transition-colors disabled:opacity-60"
+              >
+                <BookPlus size={16} />
+                {submitting ? "신청 중..." : "신청하기"}
+              </button>
+            </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {view === "admin" && !authed && (
+          <div className="max-w-sm mx-auto mt-10 text-center">
+            <div className="w-12 h-12 rounded-full bg-[#E8E4F5] flex items-center justify-center mx-auto mb-4">
+              <Lock size={20} className="text-[#4A6B70]" />
+            </div>
+            <h2
+              className="text-[16px] font-bold text-[#02343F] mb-1"
+              style={{ fontFamily: "Pretendard, sans-serif" }}
+            >
+              사서선생님 전용 화면
+            </h2>
+            <p className="text-[13px] text-[#4A6B70] mb-5">
+              비밀번호를 입력하면 신청 목록을 확인할 수 있어요.
+            </p>
+            <form onSubmit={handlePasswordSubmit} className="space-y-3">
+              <input
+                type="password"
+                value={pwInput}
+                onChange={(e) => setPwInput(e.target.value)}
+                placeholder="비밀번호"
+                className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-center text-[#02343F] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                autoFocus
+              />
+              {pwError && <p className="text-[13px] text-[#993C1D]">{pwError}</p>}
+              <button
+                type="submit"
+                disabled={loggingIn}
+                className="w-full rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#02343F] transition-colors disabled:opacity-60"
+              >
+                {loggingIn ? "확인 중..." : "확인"}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {view === "admin" && authed && (
+          <div>
+            <div className="mb-6 rounded-xl border border-[#DDD8F0] bg-white p-4">
+              <h3
+                className="text-[14px] font-bold text-[#02343F] mb-1 flex items-center gap-1.5"
+                style={{ fontFamily: "Pretendard, sans-serif" }}
+              >
+                <FileSpreadsheet size={15} className="text-[#04657A]" />
+                우리 학교도서관 소장도서 업로드
+              </h3>
+              <p className="text-[12px] text-[#4A6B70] mb-3">
+                도서관리 시스템에서 받은 소장도서 엑셀(.xls, .xlsx, .csv)을 업로드하면, 신청
+                화면의 소장 검색에 바로 반영돼요. 새로 업로드하면 기존 목록은 전체 교체됩니다.
+              </p>
+
+              {catalogCount !== null && (
+                <p className="text-[12px] text-[#0F6E56] font-medium mb-3">
+                  현재 {catalogCount.toLocaleString()}건의 소장도서가 등록되어 있어요.
+                </p>
+              )}
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                onChange={handleCatalogUpload}
+                className="hidden"
+                id="catalog-file-input"
+              />
+              <label
+                htmlFor="catalog-file-input"
+                className={`inline-flex items-center gap-2 rounded-md border border-[#04657A] text-[#02343F] bg-[#E0F0F3] hover:bg-[#E2DFFB] px-3 py-2 text-[13px] font-medium cursor-pointer transition-colors ${
+                  uploading ? "opacity-60 pointer-events-none" : ""
+                }`}
+              >
+                {uploading ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <Upload size={15} />
+                )}
+                {uploading ? "업로드 중..." : "엑셀 파일 선택"}
+              </label>
+
+              {uploadMessage && (
+                <p className="text-[12px] text-[#0F6E56] mt-2">{uploadMessage}</p>
+              )}
+              {uploadError && (
+                <p className="text-[12px] text-[#993C1D] mt-2">{uploadError}</p>
+              )}
+
+              <p className="text-[11px] text-[#4A6B70] mt-3">
+                엑셀 첫 행(또는 표 안)에 "서명"(또는 "도서명", "제목") 열이 있으면 인식돼요.
+                "저자", "출판사", "출판년도", "청구기호", "도서상태" 열이 있으면 함께
+                저장됩니다.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="bg-[#E8E4F5] rounded-md px-4 py-3">
+                <p className="text-[12px] text-[#4A6B70] mb-1">전체 신청</p>
+                <p className="text-[22px] font-medium text-[#02343F]">{requests.length}</p>
+              </div>
+              <div className="bg-[#E8E4F5] rounded-md px-4 py-3">
+                <p className="text-[12px] text-[#4A6B70] mb-1">학생 신청</p>
+                <p className="text-[22px] font-medium text-[#02343F]">{studentCount}</p>
+              </div>
+              <div className="bg-[#E8E4F5] rounded-md px-4 py-3">
+                <p className="text-[12px] text-[#4A6B70] mb-1">교직원 신청</p>
+                <p className="text-[22px] font-medium text-[#02343F]">{teacherCount}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 mb-4">
+              <div className="relative flex-1">
+                <Search
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
+                />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQueryText(e.target.value)}
+                  placeholder="도서명, 이름, 저자, 학년반으로 검색"
+                  className="w-full rounded-md border border-[#DDD8F0] bg-white pl-9 pr-3 py-2 text-[13px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                />
+              </div>
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[13px] text-[#02343F] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0]"
+              >
+                <option value="전체">전체</option>
+                <option value="학생">학생</option>
+                <option value="교직원">교직원</option>
+              </select>
+              <button
+                onClick={loadRequests}
+                className="rounded-md border border-[#DDD8F0] bg-white p-2 text-[#4A6B70] hover:bg-[#E8E4F5] transition-colors"
+                title="새로고침"
+              >
+                <RefreshCw size={15} className={loadingList ? "animate-spin" : ""} />
+              </button>
+            </div>
+
+            {loadError && <p className="text-[13px] text-[#993C1D] mb-3">{loadError}</p>}
+
+            {loadingList && requests.length === 0 && (
+              <p className="text-[13px] text-[#4A6B70] text-center py-10">불러오는 중...</p>
+            )}
+
+            {!loadingList && filtered.length === 0 && (
+              <div className="text-center py-14">
+                <p className="text-[14px] text-[#4A6B70]">
+                  {requests.length === 0
+                    ? "아직 신청된 도서가 없어요."
+                    : "검색 결과가 없어요."}
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              {filtered.map((r) => (
+                <div
+                  key={r.rowIndex}
+                  className="bg-white border border-[#DDD8F0] rounded-lg px-4 py-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span
+                          className={`text-[11px] font-medium px-1.5 py-0.5 rounded ${
+                            r.role === "학생"
+                              ? "bg-[#E0F0F3] text-[#02343F]"
+                              : "bg-[#E1F5EE] text-[#0F6E56]"
+                          }`}
+                        >
+                          {r.role}
+                        </span>
+                        <span className="text-[12px] text-[#4A6B70]">
+                          {r.classInfo} · {r.name}
+                        </span>
+                        <span className="text-[11px] text-[#9CA3AF] ml-auto">
+                          {formatDate(r.createdAt)}
+                        </span>
+                      </div>
+                      <p className="text-[15px] font-medium text-[#02343F] mb-0.5">
+                        {r.title}
+                      </p>
+                      {(r.author || r.publisher || r.pubYear || r.price) && (
+                        <p className="text-[12px] text-[#4A6B70]">
+                          {[r.author, r.publisher, r.pubYear].filter(Boolean).join(" · ")}
+                          {r.price && (
+                            <span className="text-[#0F6E56] font-medium">
+                              {(r.author || r.publisher || r.pubYear) && " · "}
+                              {Number(r.price).toLocaleString()}원
+                            </span>
+                          )}
+                        </p>
+                      )}
+                      {r.reason && (
+                        <p className="text-[12px] text-[#4A6B70] mt-1.5 bg-[#F5F3FA] rounded px-2 py-1.5">
+                          {r.reason}
+                        </p>
+                      )}
+                      {r.link && (
+                        <a
+                          href={r.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[12px] text-[#185FA5] underline mt-1 inline-block break-all"
+                        >
+                          {r.link}
+                        </a>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleDelete(r.rowIndex)}
+                      className="shrink-0 text-[#9CA3AF] hover:text-[#993C1D] p-1"
+                      title="삭제"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
