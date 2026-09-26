@@ -203,7 +203,7 @@ export default function Home() {
       setSearching(true);
       try {
         const res = await fetch(
-          `/api/aladin-search?query=${encodeURIComponent(value.trim())}`
+          `/api/book-search?query=${encodeURIComponent(value.trim())}`
         );
         const data = await res.json();
         if (res.ok && Array.isArray(data.items)) {
