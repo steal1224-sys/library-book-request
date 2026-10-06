@@ -598,223 +598,243 @@ export default function Home() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                  <span className="text-[10px]">🟣</span> 신청자 구분
-                </label>
-                <div className="flex gap-2">
-                  {["학생", "교사"].map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => updateField("role", r)}
-                      className={`flex-1 flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-[13px] font-medium transition-colors ${
-                        form.role === r
-                          ? "border-[#04657A] bg-[#E0F0F3] text-[#02343F]"
-                          : "border-[#DDD8F0] text-[#4A6B70] hover:border-[#A8D4DB]"
-                      }`}
-                    >
-                      {r === "학생" ? <GraduationCap size={14} /> : <User size={14} />}
-                      {r}
-                    </button>
-                  ))}
+
+              {/* ── 카드 1: 신청자 정보 ── */}
+              <div className="rounded-xl border border-[#DDD8F0] bg-white overflow-hidden">
+                <div className="bg-[#F5F3FA] px-4 py-2.5 border-b border-[#DDD8F0]">
+                  <p className="text-[13px] font-bold text-[#02343F]">👤 신청자 정보</p>
+                </div>
+                <div className="p-4 space-y-4">
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                      신청자 구분
+                    </label>
+                    <div className="flex gap-2">
+                      {["학생", "교사"].map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          onClick={() => updateField("role", r)}
+                          className={`flex-1 flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-[13px] font-medium transition-colors ${
+                            form.role === r
+                              ? "border-[#04657A] bg-[#E0F0F3] text-[#02343F]"
+                              : "border-[#DDD8F0] text-[#4A6B70] hover:border-[#A8D4DB]"
+                          }`}
+                        >
+                          {r === "학생" ? <GraduationCap size={14} /> : <User size={14} />}
+                          {r}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                        {form.role === "학생" ? "학년/반" : "소속"}<span className="text-[#D85A30]"> *</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={form.classInfo}
+                        onChange={(e) => updateField("classInfo", e.target.value)}
+                        placeholder={form.role === "학생" ? "예: 203" : "예: 국어과 교사"}
+                        className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                        이름<span className="text-[#D85A30]"> *</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={form.name}
+                        onChange={(e) => updateField("name", e.target.value)}
+                        placeholder="홍길동"
+                        className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                    <span className="text-[10px]">🟣</span> {form.role === "학생" ? "학년/반" : "소속"}
-                    <span className="text-[#D85A30]"> *</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={form.classInfo}
-                    onChange={(e) => updateField("classInfo", e.target.value)}
-                    placeholder={form.role === "학생" ? "예: 203" : "예: 국어과 교사"}
-                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
-                  />
+              {/* ── 카드 2: 도서 정보 ── */}
+              <div className="rounded-xl border border-[#DDD8F0] bg-white overflow-hidden">
+                <div className="bg-[#F5F3FA] px-4 py-2.5 border-b border-[#DDD8F0]">
+                  <p className="text-[13px] font-bold text-[#02343F]">📚 도서 정보</p>
                 </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                    <span className="text-[10px]">🟣</span> 이름<span className="text-[#D85A30]"> *</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => updateField("name", e.target.value)}
-                    placeholder="홍길동"
-                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
-                  />
-                </div>
-              </div>
+                <div className="p-4 space-y-4">
+                  <div className="relative" ref={searchBoxRef}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-[13px] font-bold text-[#02343F]" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                        도서명<span className="text-[#D85A30]"> *</span>
+                      </label>
+                      <a
+                        href="https://read365.edunet.net/PureScreen/SchoolSearch?schoolName=%EB%B6%80%EA%B0%9C%EC%97%AC%EC%9E%90%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90%20%EB%8F%84%EC%84%9C%EA%B4%80&provCode=E10&neisCode=E100000214"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] text-[#185FA5] underline hover:text-[#0F3D6E]"
+                      >
+                        우리학교도서관에서 검색해보기 ↗
+                      </a>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={form.title}
+                        onChange={(e) => handleTitleChange(e.target.value)}
+                        onFocus={() => searchResults.length > 0 && setShowResults(true)}
+                        placeholder="책 제목을 입력하면 검색돼요"
+                        autoComplete="off"
+                        className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                      />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        {searching ? (
+                          <Loader2 size={15} className="animate-spin text-[#9CA3AF]" />
+                        ) : (
+                          <Search size={15} className="text-[#9CA3AF]" />
+                        )}
+                      </div>
+                    </div>
 
-              <div className="relative" ref={searchBoxRef}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-[13px] font-bold text-[#02343F]" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                    <span className="text-[10px]">🟣</span> 도서명<span className="text-[#D85A30]"> *</span>
-                  </label>
-                  <a
-                    href="https://read365.edunet.net/PureScreen/SchoolSearch?schoolName=%EB%B6%80%EA%B0%9C%EC%97%AC%EC%9E%90%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90%20%EB%8F%84%EC%84%9C%EA%B4%80&provCode=E10&neisCode=E100000214"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[11px] text-[#185FA5] underline hover:text-[#0F3D6E]"
-                  >
-                    우리학교도서관에서 검색해보기 ↗
-                  </a>
-                </div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={form.title}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    onFocus={() => searchResults.length > 0 && setShowResults(true)}
-                    placeholder="책 제목을 입력하면 검색돼요"
-                    autoComplete="off"
-                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {searching ? (
-                      <Loader2 size={15} className="animate-spin text-[#9CA3AF]" />
-                    ) : (
-                      <Search size={15} className="text-[#9CA3AF]" />
+                    {showResults && searchResults.length > 0 && (
+                      <div className="absolute z-30 mt-1 w-full bg-white border border-[#DDD8F0] rounded-md shadow-lg max-h-80 overflow-y-auto">
+                        {searchResults.map((book, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => selectBook(book)}
+                            className="w-full flex gap-3 items-start text-left px-3 py-2.5 hover:bg-[#F7F4EC] border-b border-[#E8E4F5] last:border-b-0"
+                          >
+                            {book.cover ? (
+                              <img
+                                src={book.cover}
+                                alt=""
+                                className="w-9 h-12 object-cover rounded-sm shrink-0 bg-[#E8E4F5]"
+                              />
+                            ) : (
+                              <div className="w-9 h-12 rounded-sm bg-[#E8E4F5] shrink-0" />
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-[13px] font-medium text-[#02343F] leading-snug truncate">
+                                {book.title}
+                              </p>
+                              <p className="text-[12px] text-[#4A6B70] truncate">
+                                {[book.author, book.publisher, book.pubYear]
+                                  .filter(Boolean)
+                                  .join(" · ")}
+                              </p>
+                              {book.priceStandard != null && (
+                                <p className="text-[12px] text-[#0F6E56] font-medium">
+                                  {book.priceStandard.toLocaleString()}원
+                                </p>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {showResults &&
+                      !searching &&
+                      searchResults.length === 0 &&
+                      form.title.trim().length >= 2 && (
+                        <div className="absolute z-30 mt-1 w-full bg-white border border-[#DDD8F0] rounded-md shadow-lg px-3 py-3 text-[13px] text-[#4A6B70]">
+                          검색 결과가 없어요. 제목을 직접 입력해 신청할 수 있어요.
+                        </div>
+                      )}
+
+                    {selectedBook && (
+                      <p className="mt-1.5 text-[12px] text-[#0F6E56] flex items-center gap-1">
+                        <Check size={12} /> 알라딘 검색 결과에서 정보를 가져왔어요
+                      </p>
                     )}
                   </div>
-                </div>
 
-                {showResults && searchResults.length > 0 && (
-                  <div className="absolute z-30 mt-1 w-full bg-white border border-[#DDD8F0] rounded-md shadow-lg max-h-80 overflow-y-auto">
-                    {searchResults.map((book, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => selectBook(book)}
-                        className="w-full flex gap-3 items-start text-left px-3 py-2.5 hover:bg-[#F7F4EC] border-b border-[#E8E4F5] last:border-b-0"
-                      >
-                        {book.cover ? (
-                          <img
-                            src={book.cover}
-                            alt=""
-                            className="w-9 h-12 object-cover rounded-sm shrink-0 bg-[#E8E4F5]"
-                          />
-                        ) : (
-                          <div className="w-9 h-12 rounded-sm bg-[#E8E4F5] shrink-0" />
-                        )}
-                        <div className="min-w-0">
-                          <p className="text-[13px] font-medium text-[#02343F] leading-snug truncate">
-                            {book.title}
-                          </p>
-                          <p className="text-[12px] text-[#4A6B70] truncate">
-                            {[book.author, book.publisher, book.pubYear]
-                              .filter(Boolean)
-                              .join(" · ")}
-                          </p>
-                          {book.priceStandard != null && (
-                            <p className="text-[12px] text-[#0F6E56] font-medium">
-                              {book.priceStandard.toLocaleString()}원
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {showResults &&
-                  !searching &&
-                  searchResults.length === 0 &&
-                  form.title.trim().length >= 2 && (
-                    <div className="absolute z-30 mt-1 w-full bg-white border border-[#DDD8F0] rounded-md shadow-lg px-3 py-3 text-[13px] text-[#4A6B70]">
-                      검색 결과가 없어요. 제목을 직접 입력해 신청할 수 있어요.
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                        저자
+                      </label>
+                      <input
+                        type="text"
+                        value={form.author}
+                        onChange={(e) => updateField("author", e.target.value)}
+                        placeholder="저자명"
+                        className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                      />
                     </div>
-                  )}
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                        출판사
+                      </label>
+                      <input
+                        type="text"
+                        value={form.publisher}
+                        onChange={(e) => updateField("publisher", e.target.value)}
+                        placeholder="출판사명"
+                        className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                        출판년도
+                      </label>
+                      <input
+                        type="text"
+                        value={form.pubYear}
+                        onChange={(e) => updateField("pubYear", e.target.value)}
+                        placeholder="2024"
+                        className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                        가격
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={form.price}
+                          onChange={(e) => updateField("price", e.target.value.replace(/[^0-9]/g, ""))}
+                          placeholder="15000"
+                          className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 pr-8 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#9CA3AF]">
+                          원
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
-                {selectedBook && (
-                  <p className="mt-1.5 text-[12px] text-[#0F6E56] flex items-center gap-1">
-                    <Check size={12} /> 알라딘 검색 결과에서 정보를 가져왔어요
-                  </p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                    <span className="text-[10px]">🟣</span> 저자
-                  </label>
-                  <input
-                    type="text"
-                    value={form.author}
-                    onChange={(e) => updateField("author", e.target.value)}
-                    placeholder="저자명"
-                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                    <span className="text-[10px]">🟣</span> 출판사
-                  </label>
-                  <input
-                    type="text"
-                    value={form.publisher}
-                    onChange={(e) => updateField("publisher", e.target.value)}
-                    placeholder="출판사명"
-                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                    <span className="text-[10px]">🟣</span> 출판년도
-                  </label>
-                  <input
-                    type="text"
-                    value={form.pubYear}
-                    onChange={(e) => updateField("pubYear", e.target.value)}
-                    placeholder="2024"
-                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                    <span className="text-[10px]">🟣</span> 가격
-                  </label>
-                  <div className="relative">
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                      구입 수량
+                    </label>
                     <input
-                      type="text"
-                      value={form.price}
-                      onChange={(e) => updateField("price", e.target.value.replace(/[^0-9]/g, ""))}
-                      placeholder="15000"
-                      className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 pr-8 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                      type="number"
+                      min="1"
+                      value={form.quantity}
+                      onChange={(e) => updateField("quantity", e.target.value)}
+                      placeholder="1"
+                      className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#9CA3AF]">
-                      원
-                    </span>
                   </div>
                 </div>
               </div>
-              <div>
-                <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                  <span className="text-[10px]">🟣</span> 구입 수량
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={form.quantity}
-                  onChange={(e) => updateField("quantity", e.target.value)}
-                  placeholder="1"
-                  className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
-                />
-              </div>
-              <div>
-                <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                  <span className="text-[10px]">🟣</span> 신청 사유
-                </label>
-                <textarea
-                  value={form.reason}
-                  onChange={(e) => updateField("reason", e.target.value)}
-                  placeholder="예: 수업 활용, 진로 관심, 흥미 등 (선택)"
-                  rows={3}
-                  className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A] resize-none"
-                />
+
+              {/* ── 카드 3: 신청 사유 ── */}
+              <div className="rounded-xl border border-[#DDD8F0] bg-white overflow-hidden">
+                <div className="bg-[#F5F3FA] px-4 py-2.5 border-b border-[#DDD8F0]">
+                  <p className="text-[13px] font-bold text-[#02343F]">💬 신청 사유 <span className="text-[12px] font-normal text-[#9CA3AF]">(선택)</span></p>
+                </div>
+                <div className="p-4">
+                  <textarea
+                    value={form.reason}
+                    onChange={(e) => updateField("reason", e.target.value)}
+                    placeholder="예: 수업 활용, 진로 관심, 흥미 등"
+                    rows={3}
+                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A] resize-none"
+                  />
+                </div>
               </div>
 
               {submitError && (
