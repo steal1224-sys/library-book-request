@@ -454,20 +454,20 @@ export default function Home() {
 
   return (
     <div className="w-full min-h-screen bg-[#F5F3FA] flex flex-col">
-      <header className="border-b border-[#DDD8F0] bg-[#F5F3FA] sticky top-0 z-20">
+      <header className="border-b border-[#C4B5E8] bg-[#EDE8F8] sticky top-0 z-20">
         <div className="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-md bg-[#02343F] flex items-center justify-center shrink-0">
+          <div className="flex items-start gap-2.5">
+            <div className="w-9 h-9 rounded-md bg-[#4C3280] flex items-center justify-center shrink-0 mt-1">
               <span style={{ fontSize: "18px" }}>🩷</span>
             </div>
-            <div>
+            <div className="pt-1">
               <h1
-                className="text-[17px] font-bold text-[#02343F] leading-tight"
+                className="text-[17px] font-bold text-[#3B1F6E] leading-tight"
                 style={{ fontFamily: "'Gowun Batang', serif" }}
               >
                 모란글샘 구입희망도서 신청
               </h1>
-              <p className="text-[12px] text-[#4A6B70] leading-tight">부개여고 도서관</p>
+              <p className="text-[14px] text-[#7B5EA7] leading-loose" style={{ fontFamily: "'Nanum Pen Script', cursive" }}>부개여고 도서관</p>
             </div>
           </div>
           <div className="flex gap-1 bg-[#E8E4F5] rounded-lg p-1">
@@ -571,6 +571,18 @@ export default function Home() {
                 )}
                 </div>{/* /p-4 */}
               </div>
+              {/* ── 유의사항 ── */}
+              <div className="mt-4 rounded-xl border border-[#DDD8F0] bg-white overflow-hidden">
+                <div className="bg-[#F5F3FA] px-4 py-2.5 border-b border-[#DDD8F0]">
+                  <p className="text-[13px] font-bold text-[#02343F]">📋 희망도서 신청 유의사항</p>
+                </div>
+                <ul className="p-4 space-y-2 text-[12px] text-[#4A6B70] leading-snug list-none">
+                  <li className="flex gap-1.5"><span className="shrink-0 text-[#4C3280] font-bold">·</span><span>학습참고서·문제집은 신청이 어렵습니다.</span></li>
+                  <li className="flex gap-1.5"><span className="shrink-0 text-[#4C3280] font-bold">·</span><span>신청한 도서는 예산 및 심의 후 구입 여부가 결정됩니다.</span></li>
+                  <li className="flex gap-1.5"><span className="shrink-0 text-[#4C3280] font-bold">·</span><span>구입이 결정된 도서는 신청자에게 <strong className="text-[#02343F]">우선 대출</strong> 기회가 주어집니다.</span></li>
+                  <li className="flex gap-1.5"><span className="shrink-0 text-[#4C3280] font-bold">·</span><span>문의: 도서관(모란글샘) 담당 선생님</span></li>
+                </ul>
+              </div>
             </div>
 
             {/* ── 오른쪽: STEP 2 신청 폼 ── */}
@@ -578,7 +590,7 @@ export default function Home() {
               <div className="rounded-xl border-2 border-[#4C3280] bg-white overflow-hidden mb-5">
                 <div className="bg-[#4C3280] px-4 py-3">
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
-                    ✏️ STEP 2 &nbsp;·&nbsp; 읽고 싶은 책을 신청해 주세요
+                    ✏️ STEP 2 &nbsp;·&nbsp; 희망 도서 신청 양식
                   </h3>
                   <p className="text-[12px] text-[#C4B5E8] mt-0.5">
                     도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면 정보가 자동으로 채워집니다.
@@ -861,7 +873,7 @@ export default function Home() {
               className="text-[16px] font-bold text-[#02343F] mb-1"
               style={{ fontFamily: "Pretendard, sans-serif" }}
             >
-              사서선생님 전용 화면
+              관리자 전용 화면
             </h2>
             <p className="text-[13px] text-[#4A6B70] mb-5">
               비밀번호를 입력하면 신청 목록을 확인할 수 있어요.
