@@ -136,7 +136,6 @@ export default function Home() {
   const [catalogSearching, setCatalogSearching] = useState(false);
   const [catalogSearched, setCatalogSearched] = useState(false);
   const catalogTimer = useRef(null);
-  const [publicCatalogCount, setPublicCatalogCount] = useState(null);
 
   // ---- 관리자 상태 ----
   const [authed, setAuthed] = useState(false);
@@ -157,20 +156,6 @@ export default function Home() {
   const [uploadMessage, setUploadMessage] = useState("");
   const [uploadError, setUploadError] = useState("");
   const fileInputRef = useRef(null);
-
-  // 페이지 로드 시 소장도서 건수 가져오기 (신청 안내 카드에 표시)
-  useEffect(() => {
-    async function fetchPublicCatalogCount() {
-      try {
-        const res = await fetch("/api/catalog-count");
-        const data = await res.json();
-        if (res.ok && data.count) setPublicCatalogCount(data.count);
-      } catch (e) {
-        // 실패 시 조용히 무시 (기본값 표시)
-      }
-    }
-    fetchPublicCatalogCount();
-  }, []);
 
   // 검색창 바깥 클릭 시 결과 닫기
   useEffect(() => {
@@ -203,7 +188,7 @@ export default function Home() {
       setSearching(true);
       try {
         const res = await fetch(
-          `/api/book-search?query=${encodeURIComponent(value.trim())}`
+          `/api/aladin-search?query=${encodeURIComponent(value.trim())}`
         );
         const data = await res.json();
         if (res.ok && Array.isArray(data.items)) {
@@ -263,26 +248,17 @@ export default function Home() {
   }
 
   function useCatalogQueryForApply() {
-    // 1. 도서명을 신청폼에 자동 입력 + 알라딘 검색 트리거
     handleTitleChange(catalogQuery);
-    // 2. 신청 탭으로 전환 (혹시 다른 탭이면)
-    setView("apply");
-    // 3. 신청폼으로 스크롤
-    setTimeout(() => {
-      if (searchBoxRef.current) {
-        searchBoxRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-        // 도서명 입력칸에 포커스
-        const input = searchBoxRef.current.querySelector("input");
-        if (input) input.focus();
-      }
-    }, 100);
+    if (searchBoxRef.current) {
+      searchBoxRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitError("");
-    if (!form.name.trim() || (form.role === "학생" && !form.classInfo.trim()) || !form.title.trim()) {
-      setSubmitError("이름, 학년/반, 도서명은 꼭 입력해주세요.");
+    if (!form.name.trim() || !form.classInfo.trim() || !form.title.trim()) {
+      setSubmitError("이름, 학년/반 또는 소속, 도서명은 꼭 입력해주세요.");
       return;
     }
     setSubmitting(true);
@@ -443,8 +419,6 @@ export default function Home() {
 
       setUploadMessage(`${savedCount.toLocaleString()}건의 소장도서가 등록되었습니다.`);
       setCatalogCount(savedCount);
-      setPublicCatalogCount(savedCount);
-      if (typeof window !== "undefined") localStorage.setItem("catalogCount", String(savedCount));
     } catch (err) {
       setUploadError(err.message || "업로드 중 오류가 발생했어요.");
       setUploadMessage("");
@@ -466,46 +440,37 @@ export default function Home() {
     return matchesRole && matchesQuery;
   });
 
-  // 중복 도서명 감지 (전체 requests 기준)
-  const titleCountMap = requests.reduce((acc, r) => {
-    const key = r.title.trim().toLowerCase();
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {});
-  const isDuplicate = (title) => titleCountMap[title.trim().toLowerCase()] > 1;
-
   const studentCount = requests.filter((r) => r.role === "학생").length;
-  const teacherCount = requests.filter((r) => r.role === "교직원").length;
-  const totalPrice = requests.reduce((sum, r) => sum + (Number(r.price) || 0), 0);
+  const teacherCount = requests.filter((r) => r.role === "교사").length;
 
   return (
     <div className="w-full min-h-screen bg-[#F5F3FA] flex flex-col">
-      <header className="border-b border-[#DDD8F0] bg-[#E0F0F3] sticky top-0 z-20 shadow-md">
-        <div className="max-w-3xl mx-auto px-5 py-5 flex items-center justify-between">
+      <header className="border-b border-[#DDD8F0] bg-[#F5F3FA] sticky top-0 z-20">
+        <div className="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-md bg-[#02343F] flex items-center justify-center shrink-0">
               <span style={{ fontSize: "18px" }}>🩷</span>
             </div>
             <div>
               <h1
-                className="text-[13px] md:text-[17px] font-bold text-[#02343F] leading-tight whitespace-nowrap"
+                className="text-[17px] font-bold text-[#02343F] leading-tight"
                 style={{ fontFamily: "'Gowun Batang', serif" }}
               >
                 모란글샘 구입희망도서 신청
               </h1>
-              <p className="hidden md:block text-[12px] font-bold text-[#4A6B70] leading-loose" style={{ fontFamily: "'Do Hyeon', sans-serif" }}>부개여고 도서관</p>
+              <p className="text-[12px] text-[#4A6B70] leading-tight">부개여고 도서관</p>
             </div>
           </div>
           <div className="flex gap-1 bg-[#E8E4F5] rounded-lg p-1">
             <button
               onClick={() => setView("apply")}
-              className={`text-[11px] px-2 py-1 rounded-md font-medium transition-colors ${
+              className={`text-[13px] px-3 py-1.5 rounded-md font-medium transition-colors ${
                 view === "apply"
                   ? "bg-white text-[#02343F] shadow-sm"
                   : "text-[#4A6B70] hover:text-[#02343F]"
               }`}
             >
-              신청
+              신청하기
             </button>
             <button
               onClick={() => setView("admin")}
@@ -522,26 +487,19 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-3xl md:max-w-6xl mx-auto w-full px-5 py-8">
+      <main className="flex-1 max-w-3xl mx-auto w-full px-5 py-8">
         {view === "apply" && (
-          <div className="max-w-xl mx-auto md:max-w-none">
-            {/* 웹: 2단 레이아웃 (왼쪽: 소장검색+신청안내 / 오른쪽: 신청폼) / 모바일: 기존 세로 스크롤 */}
-            <div className="md:grid md:grid-cols-3 md:gap-6 md:items-start">
-              {/* 왼쪽 열: 소장검색 + 신청안내 */}
-              <div className="md:col-span-1 md:flex md:flex-col md:gap-6">
-              {/* 카드 1: 소장 검색 */}
-              <div className="md:rounded-xl md:border md:border-[#DDD8F0] md:shadow-sm md:overflow-hidden md:flex md:flex-col">
-                <div className="hidden md:flex md:items-center md:gap-2 md:bg-[#534AB7] md:px-4 md:py-3">
-                  <span style={{ fontSize: "14px" }}>🔍</span>
-                  <span className="text-white text-[13px] font-bold">소장 검색</span>
-                </div>
-                <div className="md:p-4 md:bg-white">
-            <div className="mb-7 md:mb-0 rounded-xl border-2 border-[#04657A] bg-white p-4 shadow-lg md:border-0 md:rounded-none md:shadow-none md:p-0">
-              <h3 className="text-[16px] font-extrabold text-[#02343F] mb-1 flex items-center gap-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                ✅ 먼저, 우리 학교도서관에 있는지 확인해보세요.
-              </h3>
-              <p className="text-[12px] text-[#4A6B70] mt-2 mb-3">도서명을 입력하면 모란글샘 소장 목록에서 검색합니다.</p>
-
+          <div className="max-w-xl mx-auto">
+            <div className="mb-7 rounded-xl border-2 border-[#02343F] bg-white overflow-hidden">
+              <div className="bg-[#02343F] px-4 py-3">
+                <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
+                  🔍 STEP 1 &nbsp;·&nbsp; 먼저, 우리 학교도서관에 있는지 확인해보세요
+                </h3>
+                <p className="text-[12px] text-[#A8D8DF] mt-0.5">
+                  도서명을 입력하면 모란글샘 소장 목록에서 바로 찾아드려요.
+                </p>
+              </div>
+              <div className="p-4">
               <div className="relative">
                 <input
                   type="text"
@@ -586,69 +544,41 @@ export default function Home() {
               )}
 
               {!catalogSearching && catalogSearched && catalogResults.length === 0 && (
-                <div className="mt-3 space-y-2">
-                  <div className="rounded-md bg-[#FAECE7] px-3 py-2.5">
-                    <p className="text-[12px] text-[#993C1D] font-medium mb-1">
-                      우리 학교도서관에는 없는 책이에요.
-                    </p>
-                    <p className="text-[11px] text-[#993C1D]">
-                      버튼을 누르면 도서명이 신청폼에 자동으로 입력되고,
-                      알라딘에서 저자·출판사·가격 정보도 자동으로 채워져요!
-                    </p>
-                  </div>
+                <div className="mt-3 flex items-center justify-between gap-2 rounded-md bg-[#FAECE7] px-3 py-2.5">
+                  <p className="text-[12px] text-[#993C1D]">
+                    우리 학교도서관에는 없는 책이에요. 아래에서 신청해보세요!
+                  </p>
                   <button
                     type="button"
                     onClick={useCatalogQueryForApply}
-                    className="w-full flex items-center justify-center gap-1.5 text-[14px] font-bold text-[#02343F] bg-[#A8D8D8] hover:bg-[#7CC4C4] px-3 py-3 rounded-md transition-colors shadow-sm"
+                    className="shrink-0 text-[11px] font-medium text-white bg-[#02343F] hover:bg-[#02343F] px-2.5 py-1.5 rounded-md whitespace-nowrap"
                   >
-                    📝 신청폼으로 바로 신청하기
+                    이 책 신청하기 ↓
                   </button>
                 </div>
               )}
+              </div>{/* /p-4 */}
             </div>
-                </div>
-              </div>
-              {/* 카드 2: 신청 안내 (웹에서만 표시) */}
-              <div className="hidden md:flex md:flex-col md:rounded-xl md:border md:border-[#DDD8F0] md:shadow-sm md:overflow-hidden">
-                <div className="flex items-center gap-2 bg-[#C4B8E8] px-4 py-3">
-                  <span style={{ fontSize: "14px" }}>📋</span>
-                  <span className="text-white text-[13px] font-bold">신청 안내</span>
-                </div>
-                <div className="p-4 space-y-3 bg-white">
-                  <div className="text-[16px] font-extrabold text-[#02343F] mb-1" style={{ fontFamily: "Pretendard, sans-serif" }}>✨ 읽고 싶은 책을 신청해 주세요!</div>
-                  <p className="text-[13px] text-[#4B5563] leading-relaxed">** 도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면 저자·출판사·출판년도가 자동으로 채워집니다.</p>
-                  <div className="border-t border-[#DDD8F0] pt-3 space-y-2">
-                    <div className="flex items-start gap-2 text-[13px] text-[#4A6B70]"><span className="text-[#04657A] font-bold shrink-0">·</span>도서명과 저자 꼭 입력</div>
-                    <div className="flex items-start gap-2 text-[13px] text-[#4A6B70]"><span className="text-[#04657A] font-bold shrink-0">·</span>알라딘 자동 검색 지원</div>
-                    <div className="flex items-start gap-2 text-[13px] text-[#4A6B70]"><span className="text-[#04657A] font-bold shrink-0">·</span>신청 후 검토 거쳐 구입 결정</div>
-                    <div className="flex items-start gap-2 text-[13px] text-[#4A6B70]"><span className="text-[#04657A] font-bold shrink-0">·</span>중복 신청 삼가</div>
-                  </div>
-                  <div className="bg-[#EAF4F7] rounded-lg p-3 border border-[#D0E8EC]">
-                    <p className="text-[11px] text-[#4A6B70] mb-1">현재 소장 도서</p>
-                    <p className="text-[20px] font-bold text-[#02343F]">{publicCatalogCount !== null ? publicCatalogCount.toLocaleString() + "권" : "24,481권"}</p>
-                    <a href="https://read365.edunet.net/PureScreen/SchoolSearch?schoolName=%EB%B6%80%EA%B0%9C%EC%97%AC%EC%9E%90%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90%20%EB%8F%84%EC%84%9C%EA%B4%80&provCode=E10&neisCode=E100000214" target="_blank" rel="noopener noreferrer" className="text-[11px] text-[#185FA5] underline mt-1 inline-block">우리학교도서관에서 검색해보기 ↗</a>
-                  </div>
-                </div>
-              </div>
-              </div>{/* 왼쪽 열 닫기 */}
-              {/* 오른쪽 열: 신청 폼 (col-span-2) */}
-              {/* 카드 3: 신청 폼 */}
-              <div className="md:col-span-2 md:rounded-xl md:border md:border-[#DDD8F0] md:shadow-sm md:overflow-hidden">
-                <div className="hidden md:flex md:items-center md:gap-2 md:bg-[#534AB7] md:px-4 md:py-3">
-                  <span style={{ fontSize: "14px" }}>📝</span>
-                  <span className="text-white text-[13px] font-bold">신청 폼</span>
-                  <span className="ml-auto text-[11px] text-white opacity-75">소장 검색을 먼저 한 후, 신청하세요.</span>
-                </div>
-                <div className="md:p-4 md:bg-white">
 
-            <div className="mb-6 md:hidden">
+            {/* ── 소장 검색 후 신청 안내 배너 ── */}
+            <div className="mb-6 flex items-center gap-3 rounded-xl bg-[#FFF3CD] border border-[#F5A623] px-4 py-3">
+              <span className="text-[22px] shrink-0">☝️</span>
+              <p className="text-[13px] font-bold text-[#7A4F00] leading-snug">
+                소장 검색을 먼저 한 후, 신청하세요!
+              </p>
+            </div>
+
+            <div className="mb-6">
               <h2
-                className="text-[22px] font-extrabold text-[#02343F] mb-1.5"
+                className="text-[20px] font-bold text-[#02343F] mb-1.5"
                 style={{ fontFamily: "'Gowun Batang', serif" }}
               >
                 ✨ 읽고 싶은 책을 신청해 주세요!
               </h2>
-              <p className="text-[14px] text-[#4B5563] leading-relaxed">** 도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면 저자·출판사·출판년도가 자동으로 채워집니다.</p>
+              <p className="text-[14px] text-[#4A6B70] leading-relaxed">
+                ** 도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면
+                저자·출판사·출판년도가 자동으로 채워집니다.
+              </p>
             </div>
 
             {justSubmitted && (
@@ -664,7 +594,7 @@ export default function Home() {
                   <span className="text-[10px]">🟣</span> 신청자 구분
                 </label>
                 <div className="flex gap-2">
-                  {["학생", "교직원"].map((r) => (
+                  {["학생", "교사"].map((r) => (
                     <button
                       key={r}
                       type="button"
@@ -686,13 +616,13 @@ export default function Home() {
                 <div>
                   <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
                     <span className="text-[10px]">🟣</span> {form.role === "학생" ? "학년/반" : "소속"}
-                    {form.role === "학생" && <span className="text-[#D85A30]"> *</span>}
+                    <span className="text-[#D85A30]"> *</span>
                   </label>
                   <input
                     type="text"
                     value={form.classInfo}
                     onChange={(e) => updateField("classInfo", e.target.value)}
-                    placeholder={form.role === "학생" ? "예: 203" : "예: 국어과"}
+                    placeholder={form.role === "학생" ? "예: 203" : "예: 국어과 교사"}
                     className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
                 </div>
@@ -730,7 +660,7 @@ export default function Home() {
                     value={form.title}
                     onChange={(e) => handleTitleChange(e.target.value)}
                     onFocus={() => searchResults.length > 0 && setShowResults(true)}
-                    placeholder="책 제목 입력 시 검색"
+                    placeholder="책 제목을 입력하면 검색돼요"
                     autoComplete="off"
                     className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                   />
@@ -887,15 +817,12 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 rounded-md bg-[#9F1239] text-white py-2.5 text-[14px] font-medium hover:bg-[#7F0E2D] transition-colors disabled:opacity-60"
+                className="w-full flex items-center justify-center gap-2 rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#02343F] transition-colors disabled:opacity-60"
               >
                 <BookPlus size={16} />
                 {submitting ? "신청 중..." : "신청하기"}
               </button>
             </form>
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
@@ -926,7 +853,7 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={loggingIn}
-                className="w-full rounded-md bg-[#9F1239] text-white py-2.5 text-[14px] font-medium hover:bg-[#7F0E2D] transition-colors disabled:opacity-60"
+                className="w-full rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#02343F] transition-colors disabled:opacity-60"
               >
                 {loggingIn ? "확인 중..." : "확인"}
               </button>
@@ -991,7 +918,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="grid grid-cols-3 gap-3 mb-6">
               <div className="bg-[#E8E4F5] rounded-md px-4 py-3">
                 <p className="text-[12px] text-[#4A6B70] mb-1">전체 신청</p>
                 <p className="text-[22px] font-medium text-[#02343F]">{requests.length}</p>
@@ -1001,12 +928,8 @@ export default function Home() {
                 <p className="text-[22px] font-medium text-[#02343F]">{studentCount}</p>
               </div>
               <div className="bg-[#E8E4F5] rounded-md px-4 py-3">
-                <p className="text-[12px] text-[#4A6B70] mb-1">교직원 신청</p>
+                <p className="text-[12px] text-[#4A6B70] mb-1">교사 신청</p>
                 <p className="text-[22px] font-medium text-[#02343F]">{teacherCount}</p>
-              </div>
-              <div className="bg-[#E0F0F3] rounded-md px-4 py-3">
-                <p className="text-[12px] text-[#4A6B70] mb-1">신청 도서 정가 합계</p>
-                <p className="text-[22px] font-medium text-[#02343F]">{totalPrice.toLocaleString()}원</p>
               </div>
             </div>
 
@@ -1031,7 +954,7 @@ export default function Home() {
               >
                 <option value="전체">전체</option>
                 <option value="학생">학생</option>
-                <option value="교직원">교직원</option>
+                <option value="교사">교사</option>
               </select>
               <button
                 onClick={loadRequests}
@@ -1062,7 +985,7 @@ export default function Home() {
               {filtered.map((r) => (
                 <div
                   key={r.rowIndex}
-                  className={`bg-white border rounded-lg px-4 py-3 ${isDuplicate(r.title) ? "border-[#993C1D] border-2" : "border-[#DDD8F0]"}`}
+                  className="bg-white border border-[#DDD8F0] rounded-lg px-4 py-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -1083,11 +1006,8 @@ export default function Home() {
                           {formatDate(r.createdAt)}
                         </span>
                       </div>
-                      <p className="text-[15px] font-medium text-[#02343F] mb-0.5 flex items-center gap-2 flex-wrap">
+                      <p className="text-[15px] font-medium text-[#02343F] mb-0.5">
                         {r.title}
-                        {isDuplicate(r.title) && (
-                          <span className="text-[10px] font-bold text-white bg-[#993C1D] px-1.5 py-0.5 rounded shrink-0">중복</span>
-                        )}
                       </p>
                       {(r.author || r.publisher || r.pubYear || r.price) && (
                         <p className="text-[12px] text-[#4A6B70]">
