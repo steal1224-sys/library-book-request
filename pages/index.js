@@ -490,16 +490,13 @@ export default function Home() {
       <main className="flex-1 max-w-3xl mx-auto w-full px-5 py-8">
         {view === "apply" && (
           <div className="max-w-xl mx-auto">
-            <div className="mb-7 rounded-xl border-2 border-[#02343F] bg-white overflow-hidden">
-              <div className="bg-[#02343F] px-4 py-3">
-                <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
-                  🔍 STEP 1 &nbsp;·&nbsp; 먼저, 우리 학교도서관에 있는지 확인해보세요
-                </h3>
-                <p className="text-[12px] text-[#A8D8DF] mt-0.5">
-                  도서명을 입력하면 모란글샘 소장 목록에서 바로 찾아드려요.
-                </p>
-              </div>
-              <div className="p-4">
+            <div className="mb-7 rounded-xl border border-[#DDD8F0] bg-white p-4">
+              <h3 className="text-[14px] font-semibold text-[#02343F] mb-1 flex items-center gap-1.5">
+                🔍 먼저, 우리 학교도서관에 있는지 확인해보세요
+              </h3>
+              <p className="text-[12px] text-[#4A6B70] mb-3">
+                도서명을 입력하면 모란글샘 소장 목록에서 바로 찾아드려요.
+              </p>
               <div className="relative">
                 <input
                   type="text"
@@ -557,15 +554,6 @@ export default function Home() {
                   </button>
                 </div>
               )}
-              </div>{/* /p-4 */}
-            </div>
-
-            {/* ── 소장 검색 후 신청 안내 배너 ── */}
-            <div className="mb-6 flex items-center gap-3 rounded-xl bg-[#FFF3CD] border border-[#F5A623] px-4 py-3">
-              <span className="text-[22px] shrink-0">☝️</span>
-              <p className="text-[13px] font-bold text-[#7A4F00] leading-snug">
-                소장 검색을 먼저 한 후, 신청하세요!
-              </p>
             </div>
 
             <div className="mb-6">
