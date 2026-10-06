@@ -442,11 +442,20 @@ export default function Home() {
 
   const studentCount = requests.filter((r) => r.role === "학생").length;
   const teacherCount = requests.filter((r) => r.role === "교사").length;
+  const totalPrice = requests.reduce((sum, r) => sum + (Number(r.price) || 0), 0);
+
+  // ---- 중복 도서명 감지 ----
+  const titleCountMap = requests.reduce((acc, r) => {
+    const key = r.title.trim().toLowerCase();
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  const isDuplicate = (title) => titleCountMap[title.trim().toLowerCase()] > 1;
 
   return (
     <div className="w-full min-h-screen bg-[#F5F3FA] flex flex-col">
       <header className="border-b border-[#DDD8F0] bg-[#F5F3FA] sticky top-0 z-20">
-        <div className="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-md bg-[#02343F] flex items-center justify-center shrink-0">
               <span style={{ fontSize: "18px" }}>🩷</span>
@@ -487,16 +496,19 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-3xl mx-auto w-full px-5 py-8">
+      <main className="flex-1 max-w-4xl mx-auto w-full px-5 py-8">
         {view === "apply" && (
-          <div className="max-w-xl mx-auto">
-            <div className="mb-7 rounded-xl border border-[#DDD8F0] bg-white p-4">
-              <h3 className="text-[14px] font-semibold text-[#02343F] mb-1 flex items-center gap-1.5">
-                🔍 먼저, 우리 학교도서관에 있는지 확인해보세요
-              </h3>
-              <p className="text-[12px] text-[#4A6B70] mb-3">
-                도서명을 입력하면 모란글샘 소장 목록에서 바로 찾아드려요.
-              </p>
+          <div>
+            <div className="mb-7 rounded-xl border-2 border-[#02343F] bg-white overflow-hidden">
+              <div className="bg-[#02343F] px-4 py-3">
+                <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
+                  🔍 STEP 1 &nbsp;·&nbsp; 먼저, 우리 학교도서관에 있는지 확인해보세요
+                </h3>
+                <p className="text-[12px] text-[#A8D8DF] mt-0.5">
+                  도서명을 입력하면 모란글샘 소장 목록에서 바로 찾아드려요.
+                </p>
+              </div>
+              <div className="p-4">
               <div className="relative">
                 <input
                   type="text"
@@ -554,6 +566,15 @@ export default function Home() {
                   </button>
                 </div>
               )}
+              </div>{/* /p-4 */}
+            </div>
+
+            {/* ── 소장 검색 후 신청 안내 배너 ── */}
+            <div className="mb-6 flex items-center gap-3 rounded-xl bg-[#FFF3CD] border border-[#F5A623] px-4 py-3">
+              <span className="text-[22px] shrink-0">☝️</span>
+              <p className="text-[13px] font-bold text-[#7A4F00] leading-snug">
+                소장 검색을 먼저 한 후, 신청하세요!
+              </p>
             </div>
 
             <div className="mb-6">
@@ -906,7 +927,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-2 gap-3 mb-6">
               <div className="bg-[#E8E4F5] rounded-md px-4 py-3">
                 <p className="text-[12px] text-[#4A6B70] mb-1">전체 신청</p>
                 <p className="text-[22px] font-medium text-[#02343F]">{requests.length}</p>
@@ -918,6 +939,10 @@ export default function Home() {
               <div className="bg-[#E8E4F5] rounded-md px-4 py-3">
                 <p className="text-[12px] text-[#4A6B70] mb-1">교사 신청</p>
                 <p className="text-[22px] font-medium text-[#02343F]">{teacherCount}</p>
+              </div>
+              <div className="bg-[#E0F0F3] rounded-md px-4 py-3">
+                <p className="text-[12px] text-[#4A6B70] mb-1">신청 도서 정가 합계</p>
+                <p className="text-[22px] font-medium text-[#02343F]">{totalPrice.toLocaleString()}원</p>
               </div>
             </div>
 
@@ -973,7 +998,7 @@ export default function Home() {
               {filtered.map((r) => (
                 <div
                   key={r.rowIndex}
-                  className="bg-white border border-[#DDD8F0] rounded-lg px-4 py-3"
+                  className={`bg-white border rounded-lg px-4 py-3 ${isDuplicate(r.title) ? "border-[#993C1D] border-2" : "border-[#DDD8F0]"}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -994,8 +1019,11 @@ export default function Home() {
                           {formatDate(r.createdAt)}
                         </span>
                       </div>
-                      <p className="text-[15px] font-medium text-[#02343F] mb-0.5">
+                      <p className="text-[15px] font-medium text-[#02343F] mb-0.5 flex items-center gap-2 flex-wrap">
                         {r.title}
+                        {isDuplicate(r.title) && (
+                          <span className="text-[10px] font-bold text-white bg-[#993C1D] px-1.5 py-0.5 rounded shrink-0">중복</span>
+                        )}
                       </p>
                       {(r.author || r.publisher || r.pubYear || r.price) && (
                         <p className="text-[12px] text-[#4A6B70]">
