@@ -496,108 +496,104 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-4xl mx-auto w-full px-5 py-8">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-5 py-8">
         {view === "apply" && (
-          <div>
-            <div className="mb-7 rounded-xl border-2 border-[#02343F] bg-white overflow-hidden">
-              <div className="bg-[#02343F] px-4 py-3">
-                <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
-                  🔍 STEP 1 &nbsp;·&nbsp; 먼저, 우리 학교도서관에 있는지 확인해보세요
-                </h3>
-                <p className="text-[12px] text-[#A8D8DF] mt-0.5">
-                  도서명을 입력하면 모란글샘 소장 목록에서 바로 찾아드려요.
-                </p>
-              </div>
-              <div className="p-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={catalogQuery}
-                  onChange={(e) => handleCatalogChange(e.target.value)}
-                  placeholder="책 제목을 입력해 보세요"
-                  autoComplete="off"
-                  className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
-                />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  {catalogSearching ? (
-                    <Loader2 size={15} className="animate-spin text-[#9CA3AF]" />
-                  ) : (
-                    <Search size={15} className="text-[#9CA3AF]" />
-                  )}
-                </div>
-              </div>
+          <div className="flex gap-6 items-start">
 
-              {!catalogSearching && catalogSearched && catalogResults.length > 0 && (
-                <div className="mt-3 space-y-1.5">
-                  <p className="text-[12px] text-[#0F6E56] font-medium flex items-center gap-1">
-                    <Check size={12} /> 우리 학교도서관에 있어요! ({catalogResults.length}건)
+            {/* ── 왼쪽: STEP 1 소장 검색 ── */}
+            <div className="w-[420px] shrink-0">
+              <div className="rounded-xl border-2 border-[#4C3280] bg-white overflow-hidden">
+                <div className="bg-[#4C3280] px-4 py-3">
+                  <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
+                    🔍 STEP 1 &nbsp;·&nbsp; 소장 도서 확인
+                  </h3>
+                  <p className="text-[12px] text-[#C4B5E8] mt-0.5">
+                    먼저 우리 학교도서관에 있는지 확인해보세요.
                   </p>
-                  <div className="max-h-48 overflow-y-auto rounded-md border border-[#DDD8F0] divide-y divide-[#E8E4F5]">
-                    {catalogResults.map((b, i) => (
-                      <div key={i} className="px-3 py-2 bg-[#F7F9F6]">
-                        <p className="text-[13px] font-medium text-[#02343F]">{b.title}</p>
-                        <p className="text-[11px] text-[#4A6B70]">
-                          {[b.author, b.publisher, b.year].filter(Boolean).join(" · ")}
-                          {b.call ? ` · 청구기호 ${b.call}` : ""}
-                        </p>
-                        {b.status && b.status !== "대출가능" && (
-                          <p className="text-[11px] text-[#993C1D]">현재 상태: {b.status}</p>
-                        )}
-                      </div>
-                    ))}
+                </div>
+                <div className="p-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={catalogQuery}
+                    onChange={(e) => handleCatalogChange(e.target.value)}
+                    placeholder="책 제목을 입력해 보세요"
+                    autoComplete="off"
+                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 pr-9 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {catalogSearching ? (
+                      <Loader2 size={15} className="animate-spin text-[#9CA3AF]" />
+                    ) : (
+                      <Search size={15} className="text-[#9CA3AF]" />
+                    )}
                   </div>
-                  <p className="text-[11px] text-[#4A6B70] pt-1">
-                    이미 있는 책이에요. 그래도 더 구입하고 싶으시면 아래에서 신청해주세요.
-                  </p>
                 </div>
-              )}
 
-              {!catalogSearching && catalogSearched && catalogResults.length === 0 && (
-                <div className="mt-3 flex items-center justify-between gap-2 rounded-md bg-[#FAECE7] px-3 py-2.5">
-                  <p className="text-[12px] text-[#993C1D]">
-                    우리 학교도서관에는 없는 책이에요. 아래에서 신청해보세요!
-                  </p>
-                  <button
-                    type="button"
-                    onClick={useCatalogQueryForApply}
-                    className="shrink-0 text-[11px] font-medium text-white bg-[#02343F] hover:bg-[#02343F] px-2.5 py-1.5 rounded-md whitespace-nowrap"
-                  >
-                    이 책 신청하기 ↓
-                  </button>
-                </div>
-              )}
-              </div>{/* /p-4 */}
-            </div>
+                {!catalogSearching && catalogSearched && catalogResults.length > 0 && (
+                  <div className="mt-3 space-y-1.5">
+                    <p className="text-[12px] text-[#0F6E56] font-medium flex items-center gap-1">
+                      <Check size={12} /> 우리 학교도서관에 있어요! ({catalogResults.length}건)
+                    </p>
+                    <div className="max-h-64 overflow-y-auto rounded-md border border-[#DDD8F0] divide-y divide-[#E8E4F5]">
+                      {catalogResults.map((b, i) => (
+                        <div key={i} className="px-3 py-2 bg-[#F7F9F6]">
+                          <p className="text-[13px] font-medium text-[#02343F]">{b.title}</p>
+                          <p className="text-[11px] text-[#4A6B70]">
+                            {[b.author, b.publisher, b.year].filter(Boolean).join(" · ")}
+                            {b.call ? ` · 청구기호 ${b.call}` : ""}
+                          </p>
+                          {b.status && b.status !== "대출가능" && (
+                            <p className="text-[11px] text-[#993C1D]">현재 상태: {b.status}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-[#4A6B70] pt-1">
+                      이미 있는 책이에요. 그래도 더 구입하고 싶으시면 오른쪽에서 신청해주세요.
+                    </p>
+                  </div>
+                )}
 
-            {/* ── 소장 검색 후 신청 안내 배너 ── */}
-            <div className="mb-6 flex items-center gap-3 rounded-xl bg-[#FFF3CD] border border-[#F5A623] px-4 py-3">
-              <span className="text-[22px] shrink-0">☝️</span>
-              <p className="text-[13px] font-bold text-[#7A4F00] leading-snug">
-                소장 검색을 먼저 한 후, 신청하세요!
-              </p>
-            </div>
-
-            <div className="mb-6">
-              <h2
-                className="text-[20px] font-bold text-[#02343F] mb-1.5"
-                style={{ fontFamily: "'Gowun Batang', serif" }}
-              >
-                ✨ 읽고 싶은 책을 신청해 주세요!
-              </h2>
-              <p className="text-[14px] text-[#4A6B70] leading-relaxed">
-                ** 도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면
-                저자·출판사·출판년도가 자동으로 채워집니다.
-              </p>
-            </div>
-
-            {justSubmitted && (
-              <div className="mb-5 flex items-center gap-2 rounded-lg border border-[#5DCAA5] bg-[#E1F5EE] px-4 py-3 text-[13px] text-[#085041]">
-                <Check size={16} className="shrink-0" />
-                신청이 접수되었어요. 감사합니다!
+                {!catalogSearching && catalogSearched && catalogResults.length === 0 && (
+                  <div className="mt-3 rounded-md bg-[#FAECE7] px-3 py-2.5 space-y-2">
+                    <p className="text-[12px] text-[#993C1D]">
+                      우리 학교도서관에는 없는 책이에요.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={useCatalogQueryForApply}
+                      className="w-full text-[11px] font-medium text-white bg-[#4C3280] hover:opacity-90 px-2.5 py-1.5 rounded-md"
+                    >
+                      이 책 오른쪽에서 신청하기 →
+                    </button>
+                  </div>
+                )}
+                </div>{/* /p-4 */}
               </div>
-            )}
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* ── 오른쪽: STEP 2 신청 폼 ── */}
+            <div className="flex-1 min-w-0">
+              <div className="rounded-xl border-2 border-[#4C3280] bg-white overflow-hidden mb-5">
+                <div className="bg-[#4C3280] px-4 py-3">
+                  <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
+                    ✏️ STEP 2 &nbsp;·&nbsp; 읽고 싶은 책을 신청해 주세요
+                  </h3>
+                  <p className="text-[12px] text-[#C4B5E8] mt-0.5">
+                    도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면 정보가 자동으로 채워집니다.
+                  </p>
+                </div>
+              </div>
+
+              {justSubmitted && (
+                <div className="mb-5 flex items-center gap-2 rounded-lg border border-[#5DCAA5] bg-[#E1F5EE] px-4 py-3 text-[13px] text-[#085041]">
+                  <Check size={16} className="shrink-0" />
+                  신청이 접수되었어요. 감사합니다!
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
 
               {/* ── 카드 1: 신청자 정보 ── */}
               <div className="rounded-xl border border-[#DDD8F0] bg-white overflow-hidden">
@@ -837,22 +833,23 @@ export default function Home() {
                 </div>
               </div>
 
-              {submitError && (
-                <p className="text-[13px] text-[#993C1D] bg-[#FAECE7] rounded-md px-3 py-2">
-                  {submitError}
-                </p>
-              )}
+                {submitError && (
+                  <p className="text-[13px] text-[#993C1D] bg-[#FAECE7] rounded-md px-3 py-2">
+                    {submitError}
+                  </p>
+                )}
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#02343F] transition-colors disabled:opacity-60"
-              >
-                <BookPlus size={16} />
-                {submitting ? "신청 중..." : "신청하기"}
-              </button>
-            </form>
-          </div>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full flex items-center justify-center gap-2 rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#02343F] transition-colors disabled:opacity-60"
+                >
+                  <BookPlus size={16} />
+                  {submitting ? "신청 중..." : "신청하기"}
+                </button>
+              </form>
+            </div>{/* /오른쪽 */}
+          </div>{/* /flex */}
         )}
 
         {view === "admin" && !authed && (
