@@ -569,7 +569,7 @@ export default function Home() {
                     </button>
                   </div>
                 )}
-                </div>{/* /p-4 */}
+                </div>
               </div>
               {/* ── 유의사항 ── */}
               <div className="mt-4 rounded-xl border border-[#DDD8F0] bg-white overflow-hidden">
@@ -860,8 +860,8 @@ export default function Home() {
                   {submitting ? "신청 중..." : "신청하기"}
                 </button>
               </form>
-            </div>{/* /오른쪽 */}
-          </div>{/* /flex */}
+            </div>
+          </div>
         )}
 
         {view === "admin" && !authed && (
