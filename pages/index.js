@@ -572,10 +572,10 @@ export default function Home() {
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-5 py-8">
         {view === "apply" && (
-          <div className="flex gap-6 items-start">
+          <div className="flex flex-col md:flex-row gap-6 items-start">
 
             {/* ── 왼쪽: STEP 1 소장 검색 ── */}
-            <div className="w-[420px] shrink-0">
+            <div className="w-full md:w-[420px] md:shrink-0">
               <div className="rounded-xl border-2 border-[#5B7B8A] bg-white overflow-hidden">
                 <div className="bg-[#5B7B8A] px-4 py-3">
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
