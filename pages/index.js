@@ -122,6 +122,10 @@ export default function Home() {
   const [submitError, setSubmitError] = useState("");
   const [justSubmitted, setJustSubmitted] = useState(false);
 
+  // ---- 장바구니 상태 ----
+  const [cart, setCart] = useState([]); // [{title, author, publisher, pubYear, price, quantity, reason, link}]
+  const [cartError, setCartError] = useState("");
+
   // ---- 알라딘 검색 상태 ----
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -254,26 +258,97 @@ export default function Home() {
     }
   }
 
+  // ---- 장바구니에 담기 ----
+  function handleAddToCart() {
+    setCartError("");
+    if (!form.title.trim()) {
+      setCartError("도서명을 입력해주세요.");
+      return;
+    }
+    const bookFields = {
+      title: form.title,
+      author: form.author,
+      publisher: form.publisher,
+      pubYear: form.pubYear,
+      price: form.price,
+      quantity: form.quantity,
+      reason: form.reason,
+      link: form.link,
+    };
+    setCart((prev) => [...prev, bookFields]);
+    // 도서 정보만 초기화 (신청자 정보 유지)
+    setForm((f) => ({
+      ...f,
+      title: "",
+      author: "",
+      publisher: "",
+      pubYear: "",
+      price: "",
+      quantity: "1",
+      reason: "",
+      link: "",
+    }));
+    setSelectedBook(null);
+    setSearchResults([]);
+  }
+
+  function removeFromCart(idx) {
+    setCart((prev) => prev.filter((_, i) => i !== idx));
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitError("");
-    if (!form.name.trim() || !form.classInfo.trim() || !form.title.trim()) {
-      setSubmitError("이름, 학년/반 또는 소속, 도서명은 꼭 입력해주세요.");
+
+    // 장바구니가 비어있으면 현재 입력된 도서도 같이 처리
+    const classInfoRequired = form.role === "학생";
+    if (!form.name.trim() || (classInfoRequired && !form.classInfo.trim())) {
+      setSubmitError(form.role === "학생" ? "이름과 학년/반을 입력해주세요." : "이름을 입력해주세요.");
       return;
     }
+
+    // 장바구니 + 현재 입력 중인 도서 합치기
+    let booksToSubmit = [...cart];
+    if (form.title.trim()) {
+      booksToSubmit.push({
+        title: form.title,
+        author: form.author,
+        publisher: form.publisher,
+        pubYear: form.pubYear,
+        price: form.price,
+        quantity: form.quantity,
+        reason: form.reason,
+        link: form.link,
+      });
+    }
+
+    if (booksToSubmit.length === 0) {
+      setSubmitError("신청할 도서를 한 권 이상 입력해주세요.");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const res = await fetch("/api/requests/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "신청 중 문제가 발생했어요.");
+      // 각 도서를 개별 레코드로 제출
+      for (const book of booksToSubmit) {
+        const res = await fetch("/api/requests/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: form.role,
+            classInfo: form.classInfo,
+            name: form.name,
+            ...book,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "신청 중 문제가 발생했어요.");
+        }
       }
       setForm(emptyForm);
       setSelectedBook(null);
+      setCart([]);
       setJustSubmitted(true);
       setTimeout(() => setJustSubmitted(false), 3500);
     } catch (err) {
@@ -441,7 +516,7 @@ export default function Home() {
   });
 
   const studentCount = requests.filter((r) => r.role === "학생").length;
-  const teacherCount = requests.filter((r) => r.role === "교사").length;
+  const teacherCount = requests.filter((r) => r.role === "교직원").length;
   const totalPrice = requests.reduce((sum, r) => sum + (Number(r.price) || 0), 0);
 
   // ---- 중복 도서명 감지 ----
@@ -453,17 +528,15 @@ export default function Home() {
   const isDuplicate = (title) => titleCountMap[title.trim().toLowerCase()] > 1;
 
   return (
-    <div className="w-full min-h-screen bg-[#F5F3FA] flex flex-col">
+    <div className="w-full min-h-screen bg-[#FAF9FE] flex flex-col">
       <header className="border-b border-[#C4B5E8] bg-[#EDE8F8] sticky top-0 z-20">
         <div className="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-start gap-2.5">
-            <div className="w-9 h-9 rounded-md bg-[#4C3280] flex items-center justify-center shrink-0 mt-1">
-              <span style={{ fontSize: "18px" }}>🩷</span>
-            </div>
+            <span style={{ fontSize: "28px", lineHeight: 1, alignSelf: "flex-start", marginTop: "2px" }}>📝</span>
             <div className="pt-1">
               <h1
-                className="text-[17px] font-bold text-[#3B1F6E] leading-tight"
-                style={{ fontFamily: "'Gowun Batang', serif" }}
+                className="text-[17px] font-bold text-[#2E3A52] leading-tight"
+                style={{ fontFamily: "'Gowun Dodum', sans-serif" }}
               >
                 모란글샘 구입희망도서 신청
               </h1>
@@ -502,8 +575,8 @@ export default function Home() {
 
             {/* ── 왼쪽: STEP 1 소장 검색 ── */}
             <div className="w-[420px] shrink-0">
-              <div className="rounded-xl border-2 border-[#4C3280] bg-white overflow-hidden">
-                <div className="bg-[#4C3280] px-4 py-3">
+              <div className="rounded-xl border-2 border-[#7B5EA7] bg-white overflow-hidden">
+                <div className="bg-[#7B5EA7] px-4 py-3">
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
                     🔍 STEP 1 &nbsp;·&nbsp; 소장 도서 확인
                   </h3>
@@ -580,15 +653,15 @@ export default function Home() {
                   <li className="flex gap-1.5"><span className="shrink-0 text-[#4C3280] font-bold">·</span><span>학습참고서·문제집은 신청이 어렵습니다.</span></li>
                   <li className="flex gap-1.5"><span className="shrink-0 text-[#4C3280] font-bold">·</span><span>신청한 도서는 예산 및 심의 후 구입 여부가 결정됩니다.</span></li>
                   <li className="flex gap-1.5"><span className="shrink-0 text-[#4C3280] font-bold">·</span><span>구입이 결정된 도서는 신청자에게 <strong className="text-[#02343F]">우선 대출</strong> 기회가 주어집니다.</span></li>
-                  <li className="flex gap-1.5"><span className="shrink-0 text-[#4C3280] font-bold">·</span><span>문의: 도서관(모란글샘) 담당 선생님</span></li>
+                  <li className="flex gap-1.5"><span className="shrink-0 text-[#4C3280] font-bold">·</span><span>문의: 모란글샘 담당 선생님</span></li>
                 </ul>
               </div>
             </div>
 
             {/* ── 오른쪽: STEP 2 신청 폼 ── */}
             <div className="flex-1 min-w-0">
-              <div className="rounded-xl border-2 border-[#4C3280] bg-white overflow-hidden mb-5">
-                <div className="bg-[#4C3280] px-4 py-3">
+              <div className="rounded-xl border-2 border-[#7B5EA7] bg-white overflow-hidden mb-5">
+                <div className="bg-[#7B5EA7] px-4 py-3">
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
                     ✏️ STEP 2 &nbsp;·&nbsp; 희망 도서 신청 양식
                   </h3>
@@ -601,24 +674,20 @@ export default function Home() {
               {justSubmitted && (
                 <div className="mb-5 flex items-center gap-2 rounded-lg border border-[#5DCAA5] bg-[#E1F5EE] px-4 py-3 text-[13px] text-[#085041]">
                   <Check size={16} className="shrink-0" />
-                  신청이 접수되었어요. 감사합니다!
+                  신청이 접수되었어요! 도서관 선생님이 검토 후 구입 여부를 결정해요. 감사합니다 😊
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
 
-              {/* ── 카드 1: 신청자 정보 ── */}
+              {/* ── 통합 카드 ── */}
               <div className="rounded-xl border border-[#DDD8F0] bg-white overflow-hidden">
-                <div className="bg-[#F5F3FA] px-4 py-2.5 border-b border-[#DDD8F0]">
-                  <p className="text-[13px] font-bold text-[#02343F]">👤 신청자 정보</p>
-                </div>
                 <div className="p-4 space-y-4">
+                  {/* 신청자 정보 */}
                   <div>
-                    <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                      신청자 구분
-                    </label>
-                    <div className="flex gap-2">
-                      {["학생", "교사"].map((r) => (
+                    <p className="text-[12px] font-bold text-[#4C3280] uppercase tracking-wide mb-2">👤 신청자 정보</p>
+                    <div className="flex gap-2 mb-3">
+                      {["학생", "교직원"].map((r) => (
                         <button
                           key={r}
                           type="button"
@@ -634,43 +703,41 @@ export default function Home() {
                         </button>
                       ))}
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                        {form.role === "학생" ? "학년/반" : "소속"}<span className="text-[#D85A30]"> *</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={form.classInfo}
-                        onChange={(e) => updateField("classInfo", e.target.value)}
-                        placeholder={form.role === "학생" ? "예: 203" : "예: 국어과 교사"}
-                        className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                          {form.role === "학생" ? "학년/반" : "소속"}{form.role === "학생" && <span className="text-[#D85A30]"> *</span>}
+                        </label>
+                        <input
+                          type="text"
+                          value={form.classInfo}
+                          onChange={(e) => updateField("classInfo", e.target.value)}
+                          placeholder={form.role === "학생" ? "예: 203" : "예: 국어과"}
+                          className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
+                          이름<span className="text-[#D85A30]"> *</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={form.name}
+                          onChange={(e) => updateField("name", e.target.value)}
+                          placeholder="홍길동"
+                          className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#02343F] mb-1.5" style={{ fontFamily: "Pretendard, sans-serif" }}>
-                        이름<span className="text-[#D85A30]"> *</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={form.name}
-                        onChange={(e) => updateField("name", e.target.value)}
-                        placeholder="홍길동"
-                        className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
-                      />
-                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* ── 카드 2: 도서 정보 ── */}
-              <div className="rounded-xl border border-[#DDD8F0] bg-white overflow-hidden">
-                <div className="bg-[#F5F3FA] px-4 py-2.5 border-b border-[#DDD8F0]">
-                  <p className="text-[13px] font-bold text-[#02343F]">📚 도서 정보</p>
-                </div>
-                <div className="p-4 space-y-4">
-                  <div className="relative" ref={searchBoxRef}>
+                  <div className="border-t border-[#EDE8F8]" />
+
+                  {/* 도서 정보 */}
+                  <div>
+                    <p className="text-[12px] font-bold text-[#4C3280] uppercase tracking-wide mb-2">📚 도서 정보</p>
+                    <div className="space-y-4">
+                    <div className="relative" ref={searchBoxRef}>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="block text-[13px] font-bold text-[#02343F]" style={{ fontFamily: "Pretendard, sans-serif" }}>
                         도서명<span className="text-[#D85A30]"> *</span>
@@ -826,24 +893,72 @@ export default function Home() {
                       className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A]"
                     />
                   </div>
+                  </div>
+                  </div>
+
+                  <div className="border-t border-[#EDE8F8]" />
+
+                  {/* 신청 사유 */}
+                  <div>
+                    <p className="text-[12px] font-bold text-[#4C3280] uppercase tracking-wide mb-2">💬 신청 사유 <span className="text-[11px] font-normal text-[#9CA3AF]">(선택)</span></p>
+                    <textarea
+                      value={form.reason}
+                      onChange={(e) => updateField("reason", e.target.value)}
+                      placeholder="예: 수업 활용, 진로 관심, 흥미 등"
+                      rows={3}
+                      className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A] resize-none"
+                    />
+                  </div>
+
+                  {/* 장바구니에 담기 버튼 */}
+                  {cartError && (
+                    <p className="text-[13px] text-[#993C1D] bg-[#FAECE7] rounded-md px-3 py-2">
+                      {cartError}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="w-full flex items-center justify-center gap-2 rounded-md border-2 border-[#4C3280] text-[#4C3280] py-2 text-[14px] font-medium hover:bg-[#F5F3FA] transition-colors"
+                  >
+                    <BookPlus size={15} />
+                    목록에 추가하기
+                  </button>
                 </div>
               </div>
 
-              {/* ── 카드 3: 신청 사유 ── */}
-              <div className="rounded-xl border border-[#DDD8F0] bg-white overflow-hidden">
-                <div className="bg-[#F5F3FA] px-4 py-2.5 border-b border-[#DDD8F0]">
-                  <p className="text-[13px] font-bold text-[#02343F]">💬 신청 사유 <span className="text-[12px] font-normal text-[#9CA3AF]">(선택)</span></p>
+              {/* ── 장바구니 목록 ── */}
+              {cart.length > 0 && (
+                <div className="rounded-xl border border-[#4C3280] bg-[#FAF8FF] overflow-hidden">
+                  <div className="px-4 py-2.5 bg-[#7B5EA7]">
+                    <p className="text-[13px] font-bold text-white">🛒 신청 목록 ({cart.length}권)</p>
+                  </div>
+                  <ul className="divide-y divide-[#EDE8F8]">
+                    {cart.map((book, idx) => (
+                      <li key={idx} className="flex items-start gap-3 px-4 py-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] font-medium text-[#02343F] leading-snug">{book.title}</p>
+                          <p className="text-[12px] text-[#4A6B70] mt-0.5">
+                            {[book.author, book.publisher].filter(Boolean).join(" · ")}
+                            {book.price && ` · ${Number(book.price).toLocaleString()}원`}
+                            {book.quantity && book.quantity !== "1" && ` · ${book.quantity}권`}
+                          </p>
+                          {book.reason && (
+                            <p className="text-[11px] text-[#7B5EA7] mt-0.5">💬 {book.reason}</p>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeFromCart(idx)}
+                          className="shrink-0 text-[#9CA3AF] hover:text-[#993C1D] transition-colors mt-0.5"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="p-4">
-                  <textarea
-                    value={form.reason}
-                    onChange={(e) => updateField("reason", e.target.value)}
-                    placeholder="예: 수업 활용, 진로 관심, 흥미 등"
-                    rows={3}
-                    className="w-full rounded-md border border-[#DDD8F0] bg-white px-3 py-2 text-[14px] text-[#02343F] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#7CC4D0] focus:border-[#04657A] resize-none"
-                  />
-                </div>
-              </div>
+              )}
 
                 {submitError && (
                   <p className="text-[13px] text-[#993C1D] bg-[#FAECE7] rounded-md px-3 py-2">
@@ -854,10 +969,10 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full flex items-center justify-center gap-2 rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#02343F] transition-colors disabled:opacity-60"
+                  className="w-full flex items-center justify-center gap-2 rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#024F5F] transition-colors disabled:opacity-60"
                 >
                   <BookPlus size={16} />
-                  {submitting ? "신청 중..." : "신청하기"}
+                  {submitting ? "신청 중..." : cart.length > 0 ? `${cart.length + (form.title.trim() ? 1 : 0)}권 신청하기` : "신청하기"}
                 </button>
               </form>
             </div>
@@ -966,7 +1081,7 @@ export default function Home() {
                 <p className="text-[22px] font-medium text-[#02343F]">{studentCount}</p>
               </div>
               <div className="bg-[#E8E4F5] rounded-md px-4 py-3">
-                <p className="text-[12px] text-[#4A6B70] mb-1">교사 신청</p>
+                <p className="text-[12px] text-[#4A6B70] mb-1">교직원 신청</p>
                 <p className="text-[22px] font-medium text-[#02343F]">{teacherCount}</p>
               </div>
               <div className="bg-[#E0F0F3] rounded-md px-4 py-3">
@@ -996,7 +1111,7 @@ export default function Home() {
               >
                 <option value="전체">전체</option>
                 <option value="학생">학생</option>
-                <option value="교사">교사</option>
+                <option value="교직원">교직원</option>
               </select>
               <button
                 onClick={loadRequests}
