@@ -811,7 +811,7 @@ export default function Home() {
 
                     {selectedBook && (
                       <p className="mt-1.5 text-[12px] text-[#0F6E56] flex items-center gap-1">
-                        <Check size={12} /> 알라딘 검색 결과에서 정보를 가져왔어요
+                        <Check size={12} /> 온라인서점 검색 결과에서 정보를 가져왔어요
                       </p>
                     )}
                   </div>
