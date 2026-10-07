@@ -647,7 +647,7 @@ export default function Home() {
               {/* ── 유의사항 ── */}
               <div className="mt-4 rounded-xl border border-[#DDD8F0] bg-white overflow-hidden">
                 <div className="bg-[#DDE6EA] px-4 py-2.5 border-b border-[#B8CDD3]">
-                  <p className="text-[13px] font-bold text-[#2E3A52]">🌟 희망도서 신청 유의사항</p>
+                  <p className="text-[13px] font-bold text-[#2E3A52]">✅ 희망도서 신청 유의사항</p>
                 </div>
                 <ul className="p-4 space-y-2 text-[12px] text-[#4A6B70] leading-snug list-none">
                   <li className="flex gap-1.5"><span className="shrink-0 text-[#4C3280] font-bold">·</span><span>학습참고서·문제집은 신청이 어렵습니다.</span></li>
