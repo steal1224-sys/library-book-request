@@ -532,7 +532,7 @@ export default function Home() {
       <header className="border-b border-[#C4B5E8] bg-[#EDE8F8] sticky top-0 z-20">
         <div className="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-start gap-2.5">
-            <span style={{ fontSize: "28px", lineHeight: 1, alignSelf: "flex-start", marginTop: "2px" }}>📝</span>
+            <span style={{ fontSize: "38px", lineHeight: 1, alignSelf: "flex-start", marginTop: "2px" }}>📝</span>
             <div className="pt-1">
               <h1
                 className="text-[17px] font-bold text-[#2E3A52] leading-tight"
@@ -580,7 +580,7 @@ export default function Home() {
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
                     🔍 STEP 1 &nbsp;·&nbsp; 소장 도서 확인
                   </h3>
-                  <p className="text-[12px] text-[#C4B5E8] mt-0.5">
+                  <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Gowun Dodum', sans-serif" }}>
                     먼저 우리 학교도서관에 있는지 확인해보세요.
                   </p>
                 </div>
@@ -665,7 +665,7 @@ export default function Home() {
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
                     ✏️ STEP 2 &nbsp;·&nbsp; 희망 도서 신청 양식
                   </h3>
-                  <p className="text-[12px] text-[#C4B5E8] mt-0.5">
+                  <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Gowun Dodum', sans-serif" }}>
                     도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면 정보가 자동으로 채워집니다.
                   </p>
                 </div>
