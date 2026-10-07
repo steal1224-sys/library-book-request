@@ -580,7 +580,7 @@ export default function Home() {
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
                     🔍 STEP 1 &nbsp;·&nbsp; 소장 도서 확인
                   </h3>
-                  <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Poor Story', cursive" }}>
+                  <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Gowun Dodum', sans-serif" }}>
                     먼저 우리 학교도서관에 있는지 확인해보세요.
                   </p>
                 </div>
@@ -665,7 +665,7 @@ export default function Home() {
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
                     ✏️ STEP 2 &nbsp;·&nbsp; 희망 도서 신청 양식
                   </h3>
-                  <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Poor Story', cursive" }}>
+                  <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Gowun Dodum', sans-serif" }}>
                     도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면 정보가 자동으로 채워집니다.
                   </p>
                 </div>
