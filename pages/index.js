@@ -914,7 +914,7 @@ export default function Home() {
                     className="w-full flex items-center justify-center gap-2 rounded-md border-2 border-[#4C3280] text-[#4C3280] py-2 text-[14px] font-medium hover:bg-[#F5F3FA] transition-colors"
                   >
                     <BookPlus size={15} />
-                    신청 장바구니에 추가하기
+                    신청 바구니에 추가하기
                   </button>
                 </div>
               </div>
