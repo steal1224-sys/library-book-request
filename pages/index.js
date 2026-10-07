@@ -159,6 +159,7 @@ export default function Home() {
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState("");
   const [uploadError, setUploadError] = useState("");
+  const [uploadMode, setUploadMode] = useState("replace"); // "replace" | "append"
   const fileInputRef = useRef(null);
 
   // 검색창 바깥 클릭 시 결과 닫기
@@ -481,7 +482,7 @@ export default function Home() {
             "Content-Type": "application/json",
             "x-admin-password": adminPassword,
           },
-          body: JSON.stringify({ books: batch, isFirstBatch, isLastBatch }),
+          body: JSON.stringify({ books: batch, isFirstBatch: uploadMode === "replace" ? isFirstBatch : false, isLastBatch, appendMode: uploadMode === "append" }),
         });
         const data = await res.json();
         if (!res.ok) {
@@ -1018,7 +1019,7 @@ export default function Home() {
               </h3>
               <p className="text-[12px] text-[#4A6B70] mb-3">
                 도서관리 시스템에서 받은 소장도서 엑셀(.xls, .xlsx, .csv)을 업로드하면, 신청
-                화면의 소장 검색에 바로 반영돼요. 새로 업로드하면 기존 목록은 전체 교체됩니다.
+                화면의 소장 검색에 바로 반영돼요.
               </p>
 
               {catalogCount !== null && (
@@ -1026,6 +1027,35 @@ export default function Home() {
                   현재 {catalogCount.toLocaleString()}건의 소장도서가 등록되어 있어요.
                 </p>
               )}
+
+              {/* 업로드 모드 선택 */}
+              <div className="flex gap-2 mb-3">
+                <button
+                  onClick={() => setUploadMode("replace")}
+                  className={`flex-1 text-[12px] py-1.5 rounded-md border font-medium transition-colors ${
+                    uploadMode === "replace"
+                      ? "bg-[#04657A] text-white border-[#04657A]"
+                      : "bg-white text-[#4A6B70] border-[#DDD8F0] hover:border-[#04657A]"
+                  }`}
+                >
+                  🔄 전체 교체
+                </button>
+                <button
+                  onClick={() => setUploadMode("append")}
+                  className={`flex-1 text-[12px] py-1.5 rounded-md border font-medium transition-colors ${
+                    uploadMode === "append"
+                      ? "bg-[#04657A] text-white border-[#04657A]"
+                      : "bg-white text-[#4A6B70] border-[#DDD8F0] hover:border-[#04657A]"
+                  }`}
+                >
+                  ➕ 추가 업로드
+                </button>
+              </div>
+              <p className="text-[11px] text-[#4A6B70] mb-3">
+                {uploadMode === "replace"
+                  ? "⚠️ 새 파일로 기존 목록 전체를 교체합니다."
+                  : "✅ 기존 목록은 유지하고 새 책만 추가합니다."}
+              </p>
 
               <input
                 ref={fileInputRef}
