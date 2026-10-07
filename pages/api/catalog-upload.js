@@ -38,7 +38,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const savedCount = await replaceCatalog(books, { clearFirst: !!isFirstBatch });
+    const savedCount = await replaceCatalog(books, { clearFirst: !!isFirstBatch && !appendMode });
     invalidateCatalogCache();
 
     return res.status(200).json({ ok: true, count: savedCount, isLastBatch: !!isLastBatch });
