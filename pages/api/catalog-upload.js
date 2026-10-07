@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "비밀번호가 올바르지 않습니다." });
   }
 
-  const { books, isFirstBatch, isLastBatch } = req.body || {};
+  const { books, isFirstBatch, isLastBatch, appendMode } = req.body || {};
 
   if (!Array.isArray(books)) {
     return res.status(400).json({ error: "books 배열이 필요합니다." });
