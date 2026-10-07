@@ -666,7 +666,7 @@ export default function Home() {
                     ✏️ STEP 2 &nbsp;·&nbsp; 희망 도서 신청 양식
                   </h3>
                   <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Gowun Dodum', sans-serif" }}>
-                    도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면 정보가 자동으로 채워집니다.
+                    도서명을 입력하면 온라인 서점 검색 결과가 나타나요. 원하는 책을 선택하면 서지정보가 자동으로 채워집니다.
                   </p>
                 </div>
               </div>
