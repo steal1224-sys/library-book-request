@@ -540,7 +540,7 @@ export default function Home() {
               >
                 모란글샘 구입희망도서 신청
               </h1>
-              <p className="text-[14px] text-[#7B5EA7] leading-loose" style={{ fontFamily: "'Nanum Pen Script', cursive" }}>부개여고 도서관</p>
+              <p className="text-[18px] text-[#7B5EA7] leading-loose" style={{ fontFamily: "'Nanum Pen Script', cursive" }}>부개여고 도서관</p>
             </div>
           </div>
           <div className="flex gap-1 bg-[#E8E4F5] rounded-lg p-1">
@@ -580,7 +580,7 @@ export default function Home() {
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
                     🔍 STEP 1 &nbsp;·&nbsp; 소장 도서 확인
                   </h3>
-                  <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Gowun Dodum', sans-serif" }}>
+                  <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Poor Story', cursive" }}>
                     먼저 우리 학교도서관에 있는지 확인해보세요.
                   </p>
                 </div>
@@ -665,7 +665,7 @@ export default function Home() {
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
                     ✏️ STEP 2 &nbsp;·&nbsp; 희망 도서 신청 양식
                   </h3>
-                  <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Gowun Dodum', sans-serif" }}>
+                  <p className="text-[12px] mt-0.5" style={{ color: "#F9E4B7", fontFamily: "'Poor Story', cursive" }}>
                     도서명을 입력하면 알라딘 검색 결과가 나타나요. 원하는 책을 선택하면 정보가 자동으로 채워집니다.
                   </p>
                 </div>
@@ -738,18 +738,10 @@ export default function Home() {
                     <p className="text-[12px] font-bold text-[#4C3280] uppercase tracking-wide mb-2">📚 도서 정보</p>
                     <div className="space-y-4">
                     <div className="relative" ref={searchBoxRef}>
-                    <div className="flex items-center justify-between mb-1.5">
+                    <div className="mb-1.5">
                       <label className="block text-[13px] font-bold text-[#02343F]" style={{ fontFamily: "Pretendard, sans-serif" }}>
                         도서명<span className="text-[#D85A30]"> *</span>
                       </label>
-                      <a
-                        href="https://read365.edunet.net/PureScreen/SchoolSearch?schoolName=%EB%B6%80%EA%B0%9C%EC%97%AC%EC%9E%90%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90%20%EB%8F%84%EC%84%9C%EA%B4%80&provCode=E10&neisCode=E100000214"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[11px] text-[#185FA5] underline hover:text-[#0F3D6E]"
-                      >
-                        우리학교도서관에서 검색해보기 ↗
-                      </a>
                     </div>
                     <div className="relative">
                       <input
