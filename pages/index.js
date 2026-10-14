@@ -912,7 +912,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={handleAddToCart}
-                    className="w-full flex items-center justify-center gap-2 rounded-md border-2 border-[#4C3280] text-[#4C3280] py-2 text-[14px] font-medium hover:bg-[#F5F3FA] transition-colors"
+                    className="w-full flex items-center justify-center gap-2 rounded-md border-2 border-[#6B8F71] text-[#6B8F71] py-2 text-[14px] font-medium hover:bg-[#F0F5F1] transition-colors"
                   >
                     <BookPlus size={15} />
                     신청 바구니에 추가하기
@@ -962,7 +962,7 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full flex items-center justify-center gap-2 rounded-md bg-[#02343F] text-white py-2.5 text-[14px] font-medium hover:bg-[#024F5F] transition-colors disabled:opacity-60"
+                  className="w-full flex items-center justify-center gap-2 rounded-md bg-[#6B8F71] text-white py-2.5 text-[14px] font-medium hover:bg-[#5a7a60] transition-colors disabled:opacity-60"
                 >
                   <BookPlus size={16} />
                   {submitting ? "신청 중..." : cart.length > 0 ? `${cart.length + (form.title.trim() ? 1 : 0)}권 신청하기` : "신청하기"}
