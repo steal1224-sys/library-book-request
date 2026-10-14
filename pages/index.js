@@ -912,7 +912,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={handleAddToCart}
-                    className="w-full flex items-center justify-center gap-2 rounded-md border-2 border-[#6B8F71] text-[#6B8F71] py-2 text-[14px] font-medium hover:bg-[#F0F5F1] transition-colors"
+                    className="w-full flex items-center justify-center gap-2 rounded-md border-2 border-[#6B8F71] text-[#6B8F71] py-2 text-[14px] font-bold hover:bg-[#F0F5F1] transition-colors" style={{fontFamily: "'Gowun Dodum', sans-serif"}}
                   >
                     <BookPlus size={15} />
                     신청 바구니에 추가하기
