@@ -576,8 +576,8 @@ export default function Home() {
 
             {/* ── 왼쪽: STEP 1 소장 검색 ── */}
             <div className="w-full md:w-[420px] md:shrink-0">
-              <div className="rounded-xl border-2 border-[#5B7B8A] bg-white overflow-hidden">
-                <div className="bg-[#5B7B8A] px-4 py-3">
+              <div className="rounded-xl border-2 border-[#7B5EA7] bg-white overflow-hidden">
+                <div className="bg-[#7B5EA7] px-4 py-3">
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
                     🔍 STEP 1 &nbsp;·&nbsp; 소장 도서 확인
                   </h3>
@@ -661,8 +661,8 @@ export default function Home() {
 
             {/* ── 오른쪽: STEP 2 신청 폼 ── */}
             <div className="flex-1 min-w-0">
-              <div className="rounded-xl border-2 border-[#5B7B8A] bg-white overflow-hidden mb-5">
-                <div className="bg-[#5B7B8A] px-4 py-3">
+              <div className="rounded-xl border-2 border-[#7B5EA7] bg-white overflow-hidden mb-5">
+                <div className="bg-[#7B5EA7] px-4 py-3">
                   <h3 className="text-[15px] font-bold text-white flex items-center gap-2">
                     ✏️ STEP 2 &nbsp;·&nbsp; 희망 도서 신청 양식
                   </h3>
@@ -923,7 +923,7 @@ export default function Home() {
               {/* ── 장바구니 목록 ── */}
               {cart.length > 0 && (
                 <div className="rounded-xl border border-[#4C3280] bg-[#FAF8FF] overflow-hidden">
-                  <div className="px-4 py-2.5 bg-[#5B7B8A]">
+                  <div className="px-4 py-2.5 bg-[#7B5EA7]">
                     <p className="text-[13px] font-bold text-white">🛒 신청 목록 ({cart.length}권)</p>
                   </div>
                   <ul className="divide-y divide-[#EDE8F8]">
